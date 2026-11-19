@@ -1,0 +1,30 @@
+{
+ "hero": "Ingrid Solheim",
+ "intro": [
+  "Ingrid Solheim is the lead cloud architect at Fjord & Co, a retailer with shops in six countries and an on-premises directory that has never been retired. The board wants a single, well-governed Azure platform for the next five years. Ingrid does not want to make a design she will regret, so she is studying for AZ-305 and drawing as she goes.",
+  "Follow Ingrid’s design decisions from sign-in to migration."
+ ],
+ "beats": {
+  "identity-access-management": [
+   "Fjord & Co has an on-premises directory it is not ready to retire, and it wants cloud sign-in to keep working even if the head office network drops. Ingrid compares ways of verifying passwords, and picks the one that does not depend on the on-premises network being up. She also designs how privileged access is granted just in time, and how access is reviewed so it does not pile up."
+  ],
+  "governance-monitoring-landing-zones": [
+   "Ingrid designs the structure that every new Fjord & Co subscription will land in: a hierarchy of management groups with company-wide rules at the top, and an approved starting environment for each team. She plans one central place for logs and metrics, so that monitoring is a design decision and not an afterthought."
+  ],
+  "data-storage-solutions": [
+   "A regional analytics team needs to move a SQL Server database that relies on agent jobs, and to reach a data lake privately from the shops. Ingrid assesses compatibility first, then picks the managed hosting model that fits. For a global loyalty-card service she chooses a database, a consistency level and a partition key, balancing speed against exactness. For storage, she chooses the right copy strategy for each kind of data."
+  ],
+  "business-continuity": [
+   "The payments team sets targets: recovery in under two minutes and almost no data lost. Ingrid designs from those numbers, not from preference. For payments she picks a design across two regions that is always running, for internal tools a cheaper design that is started after a failure, and for backups, the right service for the job. The lesson: let the recovery targets choose the architecture."
+  ],
+  "compute-networking-architecture": [
+   "The retail platform needs a hub-and-spoke network, with a central firewall filtering outbound traffic by name, a private line to head office, and a front door that spreads customers across regions. Ingrid works through which compute service suits which workload, from simple web apps to containers to event-driven functions."
+  ],
+  "migration-integration-operations": [
+   "Fjord & Co has a fleet of old servers and a growing set of new cloud-native services that need to talk to them. Ingrid begins with discovery and assessment, picks migration tools for servers and databases, and chooses between several messaging services by asking what each message means. An API gateway, workflow tools and network diagnostics round out the platform."
+  ]
+ },
+ "epilogue": [
+  "The Fjord & Co platform is live. On the morning of AZ-305, Ingrid notices that almost every exam question is really the same question she has been asking all year: given these requirements, which trade-off is acceptable? She reads each one slowly, finds the requirement hiding in the text, and lets it choose the answer."
+ ]
+}

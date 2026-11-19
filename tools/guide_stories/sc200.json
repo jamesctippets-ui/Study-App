@@ -1,0 +1,27 @@
+{
+ "hero": "Elena Vasquez",
+ "intro": [
+  "Elena Vasquez is a tier-2 analyst in the security operations centre of Corvane Bank. Alerts come in by the hundreds. Her lead, Marcus, has told her that this year, she will help tune the detections, lead incidents and start hunting threats on her own. She starts studying for SC-200 to make it all connect.",
+  "Follow Elena through a handful of long shifts, one incident at a time."
+ ],
+ "beats": {
+  "sentinel-analytics-automation": [
+   "Elena installs a solution for a new firewall vendor and expects incidents to appear. Nothing does, even though data is flowing in. The reason: the rule templates were installed but never turned on. She learns which kinds of rules exist, what separates a rule that creates incidents from an automation that acts on them, and how to tune detections so alert fatigue does not win."
+  ],
+  "xdr-copilot-threat-intel": [
+   "Marcus asks Elena to review the coverage map against known attacker techniques. One technique looks covered, but only by a rule disabled months ago during a noisy week. That is not the same as having no rule. Elena learns how the portal correlates alerts into incidents, how AI assistants speed up investigation, and how watchlists and behaviour analytics add context."
+  ],
+  "endpoint-identity-response": [
+   "A laptop is compromised, but its user is on a customer call. Elena applies a selective isolation that cuts off most traffic but keeps Teams and mail working, then opens a live session to remove the malicious script. She also learns how to block a known-bad file everywhere, and how identity alerts show an attacker moving from machine to machine."
+  ],
+  "email-cloudapps-incident-mgmt": [
+   "A suspected business email compromise: a hidden inbox rule forwards anything mentioning “invoice” to an outside address, and the same account signed in from an unusual place. Elena learns how to investigate email and app risk, how to enforce controls in-session, and how to carry a Sentinel incident from triage through to a clean closure."
+  ],
+  "kql-threat-hunting": [
+   "With a quiet Friday, Elena finally hunts. She learns to write queries that pipe data step by step, join tables across products, save lists of suspicious processes as reusable functions, and turn a good hunt into a standing detection. The first time her query finds something no rule had caught, Marcus nods and says nothing, which from him is high praise."
+  ]
+ },
+ "epilogue": [
+  "On exam day Elena remembers the shift where nothing was on fire and she was still finding things. The exam scenarios feel familiar: an alert, a decision, a next step. She reads each one as a case in her queue."
+ ]
+}

@@ -1,0 +1,36 @@
+{
+ "hero": "Helen Cho",
+ "intro": [
+  "Helen Cho is an information systems security manager at a federal agency that builds systems quickly and authorises them slowly. Her job is to guide each system through the Risk Management Framework from the first sketch to a signed authorisation. She prepares for CGRC to make sure she can do it by the book.",
+  "Follow Helen through the life of one system, from ‘prepare’ to ‘keep it authorised’."
+ ],
+ "beats": {
+  "governance-risk-program": [
+   "Three business units in Helen’s agency build similar systems, each with its own authorising official and its own view of acceptable risk. One unit’s approved system would not be approved in another. Helen learns how an organisation sets its risk strategy at the top, who plays which role, and how the framework’s steps tie them together."
+  ],
+  "frameworks-regulations": [
+   "A small contractor sells to U.S. and EU customers, takes card payments and has just won a subcontract involving controlled information. Helen helps them sort out which requirements are law, which are contractual and which are voluntary, and which frameworks and laws apply to which part of the business."
+  ],
+  "scope-categorization": [
+   "A student records portal is next. Helen helps the team list the information it holds, rate the impact of losing confidentiality, integrity or availability for each type, and take the highest value as the rating for the system. She also draws the boundary of what is in scope, and checks what privacy rules apply."
+  ],
+  "select-tailor": [
+   "A health agency has forty clinical applications, each tailored separately by a different team. Assessors keep finding the same decisions made differently. Helen learns to start from a baseline, adjust it with documented reasons, use overlays, and let controls provided centrally be inherited rather than reinvented."
+  ],
+  "implement-controls": [
+   "In review, the assessor finds that the plan says logging is handled by the provider, while the provider says it is the customer’s job. Helen learns that implementation statements must say who does what, how and with what evidence, and that every control needs an owner."
+  ],
+  "assess-controls": [
+   "An internal team that reports to the system owner finds that remote access logging was off for weeks. The owner asks for the finding to be removed. Helen learns why assessors must be independent, how assessments are planned and reported, and how weaknesses are tracked until they are fixed."
+  ],
+  "authorize-system": [
+   "A billing system has one high weakness that can be fixed in six weeks and several moderate ones with a credible plan. The project manager wants approval now. Helen learns what goes into an authorisation package, how the authorising official weighs risk, and the difference between full approval, a conditional one and a denial."
+  ],
+  "maintain-compliance": [
+   "A loan system is moving to a managed cloud. The owner treats it as routine, since the application is unchanged. Helen points out the hosting move changes the risk. She learns continuous monitoring, how to analyse the impact of changes, how to report posture, and how a system is properly retired."
+  ]
+ },
+ "epilogue": [
+  "After a year, Helen can follow any system through the framework from start to finish. She sits the exam thinking of the system she has just kept authorised, and the questions are the same ones she has been asking at every step: what is in scope, what is the risk, who decides, and what is the evidence?"
+ ]
+}

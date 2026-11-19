@@ -1,0 +1,33 @@
+{
+ "hero": "Amara Nwosu",
+ "intro": [
+  "Amara Nwosu manages the front office at Brookside Family Clinic. When the clinic’s email is hit by a phishing attack, she is the one who has to explain what happened to the doctors. It goes badly, and she decides to learn the subject properly. She starts studying for ISC2 Certified in Cybersecurity.",
+  "Follow Amara from a nervous front-desk manager to someone the clinic turns to when something looks wrong."
+ ],
+ "beats": {
+  "cia-risk-controls-ethics": [
+   "An assessment finds that the clinic’s patient records server is missing updates, and its room is unlocked. Amara learns the three goals of security, the difference between a threat, a weakness and an asset, and how a risk can be reduced, moved, accepted or avoided. The clinic adds a lock, a camera and training. She also learns the professional code she is expected to follow."
+  ],
+  "governance-policies-compliance": [
+   "Brookside begins serving patients across a border and taking card payments. The owner asks Amara which rules apply. She learns the difference between a policy, a standard, a procedure and a guideline, which laws and frameworks matter to which kind of business, and what it means to take reasonable care."
+  ],
+  "identity-access-management": [
+   "When a receptionist moves to billing, an access review finds she can still approve payments from her old role. Amara learns how identity is established, checked and granted, why people should have only what they need, why one person should not control a whole process, and how access should be tidied when people join, move and leave."
+  ],
+  "networking-fundamentals": [
+   "Printers, laptops and phones at the clinic all use addresses starting with 192.168. The website is slow, and the firewall logs show many requests to an old remote-access port from the internet. Amara learns how addresses and ports work, what firewalls and detection devices can and cannot do, and why old protocols deserve suspicion."
+  ],
+  "cloud-segmentation-zero-trust": [
+   "The clinic’s scheduling system is hosted in the cloud, and a backup storage area was accidentally made public. A researcher found it first. Amara learns how cloud models divide responsibility, why networks are split into zones, and why “never trust, always verify” is a good principle for places where a mistake can be this easy to make."
+  ],
+  "operations-malware-incident-response": [
+   "A staff member taps a link in a text pretending to be a courier. Malware lands. The next morning an analyst spots odd traffic and follows the plan: isolate, find out what happened, clean, recover, learn. Amara learns how data is classified and protected, the kinds of malware, and the stages of a response."
+  ],
+  "threat-intel-assets-security-testing": [
+   "A threat feed warns of a ransomware group that targets healthcare. Amara learns who attacks and why, how defenders use shared information about attackers, how old equipment becomes a risk, and how the clinic can test its readiness with scans, simulated attacks and team exercises."
+  ]
+ },
+ "epilogue": [
+  "The week before her exam, a new phishing email lands. Amara spots it in seconds, reports it, and explains calmly what to do. She smiles: her first test of the real world was passed before the exam even started."
+ ]
+}

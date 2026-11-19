@@ -1,0 +1,27 @@
+{
+ "hero": "Daniel Okoye",
+ "intro": [
+  "Daniel Okoye is the endpoint administrator at Brightline Distribution, which has warehouses, an office, and an ever-growing pile of laptops, phones and kiosks. Right now every new device is set up by hand by whoever has a free afternoon. Daniel’s boss wants that changed this year. MD-102 is the toolkit.",
+  "Follow Daniel as he moves Brightline from hand-built devices to a managed fleet."
+ ],
+ "beats": {
+  "device-provisioning-updates": [
+   "Two hundred identical laptops are arriving for warehouse kiosks. They should switch on, sign in and set themselves up with nobody touching them. Fifteen executive laptops should be prepared by a partner before they are couriered out. Daniel learns the provisioning options for each, and how to roll out Windows updates in waves so the first group finds problems before everyone else does."
+  ],
+  "prepare-identity-infrastructure": [
+   "Brightline’s regional help desks should see and manage only their own region’s devices. Daniel learns how to decide who manages devices, how devices join the directory in different ways, how groups can fill themselves, and how to tag things so each team sees only its own. He also sorts out which kinds of enrolment are allowed."
+  ],
+  "protect-devices-and-access": [
+   "Security wants a five-day grace period for ordinary compliance failures, but a device flagged as high risk should lose access at once. Daniel learns how compliance policy, risk signals and sign-in rules work together, how encryption and baseline settings are applied, and how to stop apps from running with more rights than they need."
+  ],
+  "manage-secure-applications": [
+   "Field technicians will read company email on their own phones. Daniel must allow one approved mail app, block the generic one, and be able to wipe only the company data if a phone is lost. He learns the difference between pushing an app out, offering it, and removing it, how to protect data inside apps, and how certificates and remote help fit in."
+  ],
+  "optimize-endpoint-operations": [
+   "The same background service keeps stopping on a handful of laptops, and the help desk only hears when someone is annoyed. Daniel learns to detect the problem on a schedule, fix it automatically, and report on how healthy the fleet is overall. He also scripts the repetitive work, and sets alerts so that he hears first."
+  ]
+ },
+ "epilogue": [
+  "By the end of the year Daniel’s fleet builds itself, stays patched, and tells him when something is wrong. On exam day he treats each question as an everyday decision: which tool, for which devices, with which settings, for which people."
+ ]
+}

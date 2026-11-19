@@ -1,0 +1,54 @@
+{
+ "hero": "Kai Anderson",
+ "intro": [
+  "Kai Anderson is the entire network team at Hartley & Sons, a regional retail chain with forty stores, a head office and a data room full of blinking lights. Kai got the job because nobody else wanted it. A year in, Kai has decided to learn the subject properly and sit the CCNA.",
+  "Follow Kai’s first year, from the first dead access point to the first clean OSPF table."
+ ],
+ "beats": {
+  "ccna-models-devices-cabling": [
+   "Hartley’s head office takes on a second floor. After the move, the ceiling access points never power on, and one workstation is painfully slow. Kai starts at the bottom, as the textbooks say: cables, link lights, counters. The access points were starved of power by the switch, and the slow workstation has a duplex mismatch. Two problems, both at layer 1 and 2, both found by working up the stack."
+  ],
+  "ccna-ipv4-subnetting": [
+   "A new branch needs a LAN for 100 users, one for 50 phones and cameras, a management LAN and a link between routers, all carved out of one address block. Kai sits down with a pencil and learns to work from the largest need to the smallest, so nothing overlaps and nothing is wasted. By the end of the afternoon, Kai can do the arithmetic without a calculator."
+  ],
+  "ccna-ipv6-wireless-virtualization": [
+   "Hartley adds Wi-Fi to three neighbouring stores. The installer puts all three access points on the same channel and reports slow, flaky Wi-Fi. Kai replans the channels and picks stronger security. While at it, Kai reads about the address format of the future, how devices build their own addresses, and the virtual machines and containers the data room is slowly turning into."
+  ],
+  "ccna-vlans-trunking-intervlan": [
+   "On the new floor, Sales and Engineering can reach people on the same switch, but not each other and not the other floor. The cause is twofold: the trunk between switches is missing a VLAN, and nothing is routing between VLANs. Kai learns to carry several VLANs over one link, handle phones and PCs sharing a port, and route between VLANs with a router or a switch."
+  ],
+  "ccna-stp-etherchannel-discovery": [
+   "Two cables join the distribution and access switches, but only one carries traffic; the other is blocked. Kai learns why: without spanning tree, a second path creates a loop and brings the network down. Then Kai learns to turn the two cables into one logical link, and to use neighbour discovery to see what is plugged in to what."
+  ],
+  "ccna-wireless-architectures-management": [
+   "Forty stores each have three access points and a controller at head office. When the store’s WAN link drops, so does the Wi-Fi, even though the store network is fine. Kai learns the modes access points can run in, switches the stores to one that works locally, and tightens how administrators reach devices, with encryption and central logins."
+  ],
+  "ccna-automation-rest-sdn": [
+   "Before term-time at a partner school, a new guest VLAN must go on 120 switches. Kai remembers a colleague’s joke about logging in 120 times, and learns instead about automation: describe the change once, run it everywhere. The same lesson introduces the idea of a controller, separating the thinking from the forwarding, and the APIs that let tools talk to the network."
+  ],
+  "routing-table-static-routes": [
+   "At a branch, Kai adds a default route to a backup internet link, but gives it a high administrative distance so it is used only when the main route disappears. Kai learns how a router chooses between competing routes, why the longest match wins, and why a quiet backup is sometimes the most useful route in the table."
+  ],
+  "ospfv2-single-area": [
+   "Three routers share a campus LAN, two of them also reach a branch. After enabling OSPF, Kai sees one elected as the designated router, one as the backup, and one standing aside. It looks odd, but it is exactly as it should be. Kai learns how neighbours form, how cost is calculated, and how to read the states in the output."
+  ],
+  "first-hop-redundancy": [
+   "A hospital client has two routers serving the nursing-station VLAN. If one fails, the PCs keep pointing at a dead gateway. Kai learns how two routers can share one virtual address, which one takes charge, what happens when the better router comes back, and how to tie a router’s priority to the health of its uplink."
+  ],
+  "nat-dhcp-dns-ntp": [
+   "A branch with eighty users has a single public address. Kai learns how a router can translate many private addresses into one, how DHCP hands out settings to new devices, and why correct time and working name lookups matter far more than they seem. Without them, half of what Kai is used to simply stops working."
+  ],
+  "snmp-syslog-qos-management": [
+   "Head office monitors two hundred branch routers. Kai sets up secure polling, a central place for logs, and a rule that gives voice calls priority over file downloads. Kai also learns when to limit traffic and when to smooth it, and how to move configuration files safely."
+  ],
+  "security-concepts-aaa-vpn": [
+   "A new branch router at a bank client needs hardening. Kai sets strong secrets, creates local users, restricts remote access to encrypted sessions, and adds timeouts and lockouts. Then central logins for everyone, and a decision about which kind of VPN connects the branch and which connects people at home."
+  ],
+  "acls-layer2-wireless-security": [
+   "A school complains that students get the wrong gateway from the Wi-Fi. Someone has plugged a personal router into a classroom wall port. Kai enables the protections that stop rogue servers on access ports, learns how to write filters that permit and deny with the right wildcard, and chooses the strongest wireless security the clients support."
+  ]
+ },
+ "epilogue": [
+  "On exam day Kai is surprised by how many of the questions look like Hartley tickets: a link that is slow, a route that is missing, a rule that blocks the wrong thing. The data room is quiet, the stores are online, and Kai reads the first scenario with a grin."
+ ]
+}

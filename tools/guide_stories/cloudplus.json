@@ -1,0 +1,30 @@
+{
+ "hero": "Grace Mbeki",
+ "intro": [
+  "Grace Mbeki is a systems administrator at Pinecrest Health, a mid-sized clinic network that has outgrown its server room. She has been asked to help move to the cloud. Her manager has said, kindly, that nobody expects her to know everything, only to choose well. She starts studying for CompTIA Cloud+.",
+  "Follow Grace through Pinecrest’s move to the cloud and the first year of running it."
+ ],
+ "beats": {
+  "deployment-models-virtualization": [
+   "A university, a research lab and Pinecrest all need to work under the same research-compliance rules, and none wants to build the infrastructure alone. Grace learns that sharing one built for a community is a model of its own, alongside public, private and hybrid. She also learns what sits underneath: the hypervisor, virtual machines and containers."
+  ],
+  "scaling-resilience-storage": [
+   "For a one-day flash sale at the clinic’s online pharmacy, Pinecrest cannot afford to keep peak capacity running all year. Grace learns to add and remove instances automatically behind a load balancer. She also learns the difference between staying up and recovering fast, how recovery targets are set, and which kind of storage suits which job."
+  ],
+  "security-fundamentals": [
+   "Pinecrest’s public web and mail servers are going into a protected zone between two firewalls, so a compromise there does not reach patient systems. Grace learns who gets to do what and how that is checked, how data is protected at rest and in transit, and how the network watches for attacks."
+  ],
+  "deployment-strategies": [
+   "Pinecrest’s old physical file server is moved as-is into a cloud VM, then described in code so it can be rebuilt on demand. Grace learns safe ways to release new versions to a few users first, the different kinds of backup, how sites are kept ready for disaster, and how to automate provisioning and releases."
+  ],
+  "operations-governance": [
+   "Before setting any alert, Grace’s team watches normal behaviour for weeks, so they do not drown in false alarms. They report cost by department, track every change, and record what runs where. She learns that cloud operations is as much about habits and records as it is about technology."
+  ],
+  "troubleshooting-methodology": [
+   "A user says one VM feels slow. Grace does not resize it. She identifies the symptom, forms a theory (a noisy neighbour on the same host), tests it, and only then acts, and records what she found. The method works the same for network, storage and permissions problems."
+  ]
+ },
+ "epilogue": [
+  "On the day of the exam Grace thinks about the clinic’s new cloud setup: a model chosen for reasons, a plan for growth, security in layers, tested releases and a habit of asking, “what do we know, and what is our theory?” She starts reading, one scenario at a time."
+ ]
+}

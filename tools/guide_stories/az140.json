@@ -1,0 +1,27 @@
+{
+ "hero": "Chloe Tan",
+ "intro": [
+  "Chloe Tan works for the IT team at St. Anselm Hospital. Nurses, radiologists and administrators all want a Windows desktop that follows them from room to room, and the hospital has decided to deliver it with Azure Virtual Desktop. Chloe has been told she will run it. She has four months to learn what that means.",
+  "Follow Chloe’s rollout, from the first host pool to the first heavy Monday."
+ ],
+ "beats": {
+  "host-pools-and-images": [
+   "The first decision: who gets what? A call centre of two hundred agents can share a pool of virtual machines, since their work is identical and nothing needs to be kept on the machine. A handful of developers need their own persistent desktops with their own tools. Chloe learns how to group users, apps and desktops, how people are assigned to machines, and how to keep the base image up to date."
+  ],
+  "networking-storage-capacity-planning": [
+   "Three thousand users will log in at 8 a.m., all needing their profile loaded quickly. Chloe learns where profiles are stored, how to pick a storage option for speed and cost, and how the network path between a user and their desktop affects the experience. She also works out how many sessions fit on each machine so the hospital does not overspend."
+  ],
+  "identity-and-security-for-avd": [
+   "The compliance team has requirements: some session hosts will not be joined to the hospital’s domain, access must be conditional, and screens must not be captured. Chloe learns the different ways to join machines, which roles let people connect or manage, and how to limit what users can do inside a session. Least privilege turns out to be the main idea."
+  ],
+  "user-environments-profiles-and-apps": [
+   "A nursing-station pool is shared by many clinicians. Radiology needs a licensed imaging application that no-one else should see. Everyone needs their mail and files to follow them, but not the entire profile. Teams calls must not stutter. Chloe learns how profiles are stored, how apps are delivered separately from images, and how to hide an app from users who should not see it."
+  ],
+  "monitoring-maintenance-and-scaling": [
+   "On the first heavy Monday, a handful of sign-ins fail. Chloe uses the connection logs to follow one failing session from start to finish and finds the stall. She also sets machines to switch on as demand grows and off at night, drains a machine before patching it, and plans updates so no clinician loses a session."
+  ]
+ },
+ "epilogue": [
+  "Chloe’s rollout is a success: nurses log in at one station and pick up where they left off at another. On exam day she imagines each question as a request from the hospital, and the answer as the choice she would actually make."
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "hero": "Hiroshi Tanaka",
+ "intro": [
+  "Hiroshi Tanaka is a security engineer at Kestrel Logistics. The company is moving fast into cloud and AI: copilots for staff, agents that touch live systems, and a lot of data in places nobody has fully mapped. Hiroshi’s job is to make it safe without making it slow, and SC-500 is how he is organising what he needs to know.",
+  "Follow Hiroshi as he secures Kestrel’s cloud and AI estate."
+ ],
+ "beats": {
+  "identity-access-governance": [
+   "A leaked account is disabled, but the attacker still holds a token that would be valid for another hour. Hiroshi learns how apps can be told about the change within minutes rather than waiting for expiry. He also sets up trust with partner tenants, secret-free identities for workloads, packages of access, and privileged roles that are only active when needed."
+  ],
+  "network-perimeter-security": [
+   "Kestrel’s administrators must reach production VMs without those VMs ever having a public address, and outbound traffic should be inspected even inside encrypted connections. Hiroshi works through the layers: rules on subnets and groups of machines, a central firewall, a web application filter in a test mode before enforcing, and protection from floods of traffic."
+  ],
+  "data-secrets-protection": [
+   "Compliance wants a salary column encrypted even from administrators, and separately wants ordinary support staff to stop seeing it. Those are two different requirements with two different tools. Hiroshi also learns how secrets and keys are stored and who may use them, how storage accounts are accessed, and how databases are encrypted and monitored."
+  ],
+  "ai-workload-security": [
+   "A financial customer wants an AI workload protected so tightly that even the cloud provider cannot see the data while it is being processed. Hiroshi learns the levels of encryption, from disks to hosts to confidential computing, how containers and apps are hardened, and how each AI agent gets its own identity and limits so it cannot act as a blank cheque."
+  ],
+  "security-posture-ops": [
+   "Leadership wants one trending number. The auditor wants proof for a specific standard. Hiroshi learns that these are different views of the same environment. He connects data sources, writes detection rules, automates responses, and extends coverage across more than one cloud. The picture of Kestrel’s security is finally in one place."
+  ]
+ },
+ "epilogue": [
+  "Kestrel’s AI rollout goes ahead on schedule, safely. On exam day Hiroshi finds that nearly every scenario has a tension in it: easy versus safe, fast versus controlled. He has learned to ask which requirement is non-negotiable, and to choose from there."
+ ]
+}

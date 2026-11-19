@@ -6,12 +6,14 @@ reflowable book per track that reads like a beginner's guide:
 
   Start here          what the exam is and how to use the book
   Part 1  Lessons     one chapter per app lesson: chapter in a nutshell, the everyday picture, the details,
-                      words to know, watch-out traps, a worked example, on-the-job advice, and a short quiz
-                      with the answers right after it
+                      words to know, watch-out traps, a worked example, more examples (head-to-head choices,
+                      processes in order, fill-in-the-blank sentences, commands), on-the-job advice, and a short
+                      quiz with the answers right after it. If tools/guide_stories/<track>.json exists, each
+                      chapter also opens with the next beat of a running story about one character
   Part 2  Cheat sheet one short section per topic
   Part 3  Word bank   every flashcard as a glossary entry, grouped by exam domain
-  Part 4  Worked examples
-                      case studies, "put it in order" processes, head-to-head choices, commands to know
+  Part 4  Case studies
+                      the longer scenario questions, each with its answers
   Part 5  Practice questions
                       the whole question bank in sets of ten, each set followed by its answers
 
@@ -25,6 +27,9 @@ CrossPoint, and any other EPUB reader):
   * Callouts are bold lead-in words ("Remember:", "Watch out:") rather than icons or boxes.
   * A real table of contents (EPUB 3 nav plus the EPUB 2 NCX older readers use), two levels deep.
   * Questions that need a picture (the `image` field) are left out, and the count is reported.
+
+Stories: tools/guide_stories/<track>.json holds {"hero", "who", "intro": [...], "beats": {lessonId: [...]},
+"epilogue": [...]}; a track without a file simply has no story.
 
 Usage (run `python3 build.py` first so dist/data is fresh):
 
@@ -379,11 +384,16 @@ def part_page(title, intro_paragraphs, contents=None):
     return body
 
 
-def start_here(track, cfg, data, counts):
+def start_here(track, cfg, data, counts, story=None):
     label, sub = track["label"], track["subtitle"]
     body = [f"<h1>Start here</h1>"]
     body.append(paras(f"This guide gets you ready for the {label} exam ({sub}). It is written for someone starting out: "
                       "short paragraphs, everyday comparisons first, the technical detail second, and a quick quiz at the end of every chapter."))
+    if story:
+        body.append(f"<h2>Meet {esc(story['hero'])}</h2>")
+        body.append("\n".join(paras(p) for p in story["intro"]))
+        body.append(paras(f"{first_name(story)}'s story runs through the lessons, one scene at the start of each chapter, "
+                          "so each new idea arrives with a reason to care about it."))
     body.append("<h2>About the exam</h2>")
     facts = []
     if cfg.get("passLabel"):
@@ -394,11 +404,10 @@ def start_here(track, cfg, data, counts):
     body.append(bullets(facts) if facts else paras("Check the official exam page for the current format, length and passing score."))
     body.append("<h2>How this book is organised</h2>")
     body.append(bullets([
-        f"Part 1, The lessons: {counts['lessons']} chapters. Read these in order the first time.",
+        f"Part 1, The lessons: {counts['lessons']} chapters, each with extra examples. Read these in order the first time.",
         f"Part 2, Cheat sheet: {counts['cheat']} one-screen summaries for the night before.",
         f"Part 3, Word bank: {counts['cards']} terms with plain definitions and examples.",
-        "Part 4, Worked examples: case studies, step-by-step processes, head-to-head choices"
-        + (" and commands." if counts["cli"] else "."),
+        "Part 4, Case studies: longer scenarios with questions and answers.",
         f"Part 5, Practice questions: {counts['questions']} questions in sets of ten, with the answers at the end of each set.",
     ]))
     body.append("<h2>How to use it</h2>")
@@ -414,13 +423,168 @@ def start_here(track, cfg, data, counts):
     return "\n".join(body)
 
 
-def lesson_chapter(n, lesson, cards, questions):
+# ---------------------------------------------------------------- extra examples and story
+
+STORIES = ROOT / "tools" / "guide_stories"
+_STOP = set("""a an and are as at be been but by can do does for from has have how if in into is it its not of on or so than that the
+their them then there these they this to up use used uses using was were what when where which while who why will with you your
+should would could may might also more most other some such only each any all both one two three four five new""".split())
+
+
+def _tokens(text):
+    return [w for w in re.findall(r"[a-z0-9][a-z0-9+#.\-]{2,}", str(text).lower()) if w not in _STOP]
+
+
+def _item_text(kind, it):
+    if kind == "compare":
+        return " ".join([it["scenario"], it["optionA"], it["optionB"], it["why"]])
+    if kind == "sequence":
+        return " ".join([it["prompt"], *it["steps"], it["explanation"]])
+    if kind == "madlib":
+        opts = [b["options"][b["correct"]] for b in it["blanks"]]
+        return " ".join([it["scenario"], *opts, it["explanation"]])
+    return " ".join([it["prompt"], it["command"], it["explanation"]])
+
+
+def assign_examples(data, cards, questions):
+    """Maps every compare / sequence / madlib / CLI item to the lesson it fits best.
+
+    Scores are tf-idf cosine similarity between the item text and the lesson (title and key terms count triple),
+    nudged up when the item's category matches the lesson's. Each lesson takes at most `cap` items so no chapter
+    is swamped. Returns {lessonIndex: {"compare": [...], "sequence": [...], "madlib": [...], "cli": [...]}}.
+    """
+    import math
+    from collections import Counter
+    lessons = data["lessons"]
+    docs = []
+    lcats = []
+    for l in lessons:
+        vocab = [cards[i] for i in l.get("vocabIds", []) if i in cards]
+        qs = [questions[i] for i in l.get("quizIds", []) if i in questions]
+        lcats.append(Counter([c.get("cat") for c in vocab] + [q.get("cat") for q in qs]))
+        text = " ".join([l["title"]] * 3 + list(l.get("keyTerms", [])) * 3 + [l.get("summary", ""), l["reading"]]
+                        + [c["front"] + " " + c["back"] for c in vocab] + list(l.get("commonTraps", [])))
+        docs.append(Counter(_tokens(text)))
+    items = []
+    for kind, key in (("compare", "compare"), ("sequence", "sequences"), ("madlib", "madlibs"), ("cli", "cliChallenges")):
+        for it in data.get(key, []):
+            items.append((kind, it, Counter(_tokens(_item_text(kind, it)))))
+    n = len(lessons)
+    df = Counter()
+    for d in docs:
+        df.update(d.keys())
+    idf = {w: math.log((n + 1) / (c + 0.5)) + 1 for w, c in df.items()}
+
+    def vec(c):
+        v = {w: (1 + math.log(t)) * idf.get(w, 1.0) for w, t in c.items()}
+        norm = math.sqrt(sum(x * x for x in v.values())) or 1.0
+        return {w: x / norm for w, x in v.items()}
+
+    lv = [vec(d) for d in docs]
+    pairs = []
+    for ii, (kind, it, c) in enumerate(items):
+        iv = vec(c)
+        for li in range(n):
+            score = sum(x * lv[li].get(w, 0.0) for w, x in iv.items())
+            cats = lcats[li]
+            if cats and it.get("cat") in cats:
+                score *= 1.0 + 0.15 * cats[it["cat"]] / sum(cats.values())
+            pairs.append((score, ii, li))
+    pairs.sort(reverse=True)
+    cap = max(8, math.ceil(len(items) / max(n, 1) * 2))
+    load, placed, out = Counter(), set(), {i: {"compare": [], "sequence": [], "madlib": [], "cli": []} for i in range(n)}
+    for score, ii, li in pairs:
+        if ii in placed or load[li] >= cap:
+            continue
+        placed.add(ii)
+        load[li] += 1
+        out[li][items[ii][0]].append(items[ii][1])
+    # Every chapter gets at least one extra example: an empty chapter takes its best-scoring item from a chapter that has three or more.
+    where = {}
+    for li in range(n):
+        for kind, lst in out[li].items():
+            for it in lst:
+                where[id(it)] = (li, kind)
+    for li in range(n):
+        if load[li]:
+            continue
+        best = None
+        for score, ii, lj in pairs:
+            if lj != li or score <= 0:
+                continue
+            kind, it, _c = items[ii]
+            holder = where[id(it)][0]
+            if holder != li and load[holder] >= 3:
+                best = (ii, holder)
+                break
+        if best:
+            ii, holder = best
+            kind, it, _c = items[ii]
+            out[holder][kind].remove(it)
+            load[holder] -= 1
+            out[li][kind].append(it)
+            load[li] += 1
+            where[id(it)] = (li, kind)
+    return out
+
+
+def load_story(key):
+    path = STORIES / f"{key}.json"
+    if not path.exists():
+        return None
+    return json.loads(path.read_text())
+
+
+def first_name(story):
+    return story["hero"].split()[0]
+
+
+def examples_html(ex):
+    """The 'More examples' section for one chapter."""
+    parts = []
+    if ex["compare"]:
+        parts.append("<h3>Which would you choose?</h3>")
+        for c in ex["compare"]:
+            better = "A" if str(c["better"]).upper() == "A" else "B"
+            parts.append(paras(c["scenario"]))
+            parts.append(f'<p class="opt"><b>A.</b> {esc(c["optionA"])}</p><p class="opt"><b>B.</b> {esc(c["optionB"])}</p>')
+            parts.append(f"<p><b>Better: {better}.</b> {esc(c['why'])}</p>")
+    if ex["sequence"]:
+        parts.append("<h3>Put it in order</h3>")
+        for s in ex["sequence"]:
+            parts.append(paras(s["prompt"]))
+            parts.append(bullets(s["steps"], ordered=True))
+            parts.append(paras(s["explanation"]))
+    if ex["madlib"]:
+        parts.append("<h3>Fill in the blanks</h3>")
+        for m in ex["madlib"]:
+            text = m["scenario"]
+            for b in m["blanks"]:
+                text = text.replace("{" + b["key"] + "}", b["options"][b["correct"]].upper())
+            parts.append(paras(text))
+            parts.append(paras(m["explanation"], "small"))
+    if ex["cli"]:
+        parts.append("<h3>Commands to try</h3>")
+        for c in ex["cli"]:
+            parts.append(f"<p>{esc(c['prompt'])}</p>")
+            parts.append(f"<p><b>{esc(c['command'])}</b></p>")
+            parts.append(paras(c["explanation"], "small"))
+    if not parts:
+        return ""
+    return "<h2>More examples</h2>\n" + "\n".join(p for p in parts if p)
+
+
+def lesson_chapter(n, lesson, cards, questions, extra=None, story=None):
     title = lesson["title"]
     b = [f"<h1>Chapter {n}: {esc(title)}</h1>"]
     if lesson.get("summary"):
         b.append(f'<p class="nutshell"><b>In a nutshell:</b> {esc(lesson["summary"])}</p>')
     if lesson.get("keyTerms"):
         b.append(f'<p class="callout"><b>You will meet:</b> {esc(", ".join(lesson["keyTerms"]))}.</p>')
+    beat = (story or {}).get("beats", {}).get(lesson["id"])
+    if beat:
+        b.append(f"<h2>{esc(first_name(story))}'s story</h2>")
+        b.append("\n".join(paras(p) for p in beat))
     if lesson.get("fundamentals"):
         b.append("<h2>The everyday picture</h2>")
         b.append(paras(lesson["fundamentals"], chunk=True))
@@ -429,13 +593,18 @@ def lesson_chapter(n, lesson, cards, questions):
     vocab = [cards[i] for i in lesson.get("vocabIds", []) if i in cards]
     if vocab:
         b.append("<h2>Words to know</h2>")
-        b.append("".join(f"<p><b>{esc(c['front'])}.</b> {esc(c['back'])}</p>" for c in vocab))
+        b.append("".join(
+            f"<p><b>{esc(c['front'])}.</b> {esc(c['back'])}"
+            + (f" <i>Example:</i> {esc(c['detail'])}" if c.get("detail") else "") + "</p>"
+            for c in vocab))
     if lesson.get("commonTraps"):
         b.append("<h2>Watch out</h2>")
         b.append(bullets(lesson["commonTraps"]))
     if lesson.get("scenario"):
         b.append("<h2>A worked example</h2>")
         b.append(paras(lesson["scenario"], chunk=True))
+    if extra:
+        b.append(examples_html(extra))
     if lesson.get("onTheJob"):
         b.append("<h2>On the job</h2>")
         b.append(paras(lesson["onTheJob"], chunk=True))
@@ -459,34 +628,7 @@ def case_study_page(cs):
     return "\n".join(b)
 
 
-def sequences_page(items):
-    b = ["<h1>Put it in order</h1>", paras("Each process below is listed in the correct order, with a note on why it works that way.")]
-    for i, s in enumerate(items, 1):
-        b.append(f"<h2>{i}. {esc(s['prompt'])}</h2>")
-        b.append(bullets(s["steps"], ordered=True))
-        b.append(paras(s["explanation"], chunk=True))
-    return "\n".join(b)
 
-
-def compare_page(items):
-    b = ["<h1>Which would you choose?</h1>", paras("Each scenario has two plausible answers. The better one is marked, with the reason.")]
-    for i, c in enumerate(items, 1):
-        better = "A" if str(c["better"]).upper() == "A" else "B"
-        b.append(f"<h2>Scenario {i}</h2>")
-        b.append(paras(c["scenario"]))
-        b.append(f'<p class="opt"><b>A.</b> {esc(c["optionA"])}</p><p class="opt"><b>B.</b> {esc(c["optionB"])}</p>')
-        b.append(f"<p><b>Better: {better}.</b></p>")
-        b.append(paras(c["why"], chunk=True))
-    return "\n".join(b)
-
-
-def cli_page(items):
-    b = ["<h1>Commands to know</h1>", paras("Each item says what you want to do and the command that does it.")]
-    for i, c in enumerate(items, 1):
-        b.append(f"<p><b>{i}.</b> {esc(c['prompt'])}</p>")
-        b.append(f"<p>Command: <b>{esc(c['command'])}</b></p>")
-        b.append(paras(c["explanation"]))
-    return "\n".join(b)
 
 
 def cheat_page(sec):
@@ -508,15 +650,25 @@ def build_track(track, tracks_cfg, out_dir, quiet=False):
     counts = {"lessons": len(data["lessons"]), "cheat": len([s for s in data.get("cheatSheet", []) if s.get("points")]),
               "cards": len(cards), "questions": len(usable_q), "skipped": skipped, "cli": len(data.get("cliChallenges", []))}
 
-    book.add("Start here", start_here(track, cfg, data, counts))
+    story = load_story(key)
+    if story:
+        missing = [l["id"] for l in data["lessons"] if l["id"] not in story.get("beats", {})]
+        if missing:
+            sys.exit(f"{key}: story has no beat for lessons {missing}")
+    extras = assign_examples(data, cards, all_q)
+    book.add("Start here", start_here(track, cfg, data, counts, story))
 
     # Part 1
     parent = book.add("Part 1: The lessons", part_page(
         "Part 1: The lessons",
         [f"{counts['lessons']} chapters. Each one starts with the big picture in plain words, then the detail, then a short quiz."],
-        [f"Chapter {i}: {l['title']}" for i, l in enumerate(data["lessons"], 1)]))
+        [f"Chapter {i}: {l['title']}" for i, l in enumerate(data["lessons"], 1)]
+        + ([f"Epilogue: {first_name(story)} and the exam"] if story and story.get("epilogue") else [])))
     for i, lesson in enumerate(data["lessons"], 1):
-        book.add(f"Chapter {i}: {lesson['title']}", lesson_chapter(i, lesson, cards, all_q), parent)
+        book.add(f"Chapter {i}: {lesson['title']}", lesson_chapter(i, lesson, cards, all_q, extras[i - 1], story), parent)
+    if story and story.get("epilogue"):
+        title_ep = f"Epilogue: {first_name(story)} and the exam"
+        book.add(title_ep, f"<h1>{esc(title_ep)}</h1>\n" + "\n".join(paras(p) for p in story["epilogue"]), parent)
 
     # Part 2
     secs = [s for s in data.get("cheatSheet", []) if s.get("points")]
@@ -537,21 +689,12 @@ def build_track(track, tracks_cfg, out_dir, quiet=False):
         book.add(f"Words: {lab} ({len(cs)})", glossary_page(lab, cs), parent)
 
     # Part 4
-    ex_pages = []
-    for cs in data.get("caseStudies", []):
-        ex_pages.append((f"Case study: {cs['title']}", case_study_page(cs)))
-    if data.get("sequences"):
-        ex_pages.append(("Put it in order", sequences_page(data["sequences"])))
-    if data.get("compare"):
-        ex_pages.append(("Which would you choose?", compare_page(data["compare"])))
-    if data.get("cliChallenges"):
-        ex_pages.append(("Commands to know", cli_page(data["cliChallenges"])))
-    if ex_pages:
-        parent = book.add("Part 4: Worked examples", part_page(
-            "Part 4: Worked examples", ["Real-world scenarios and step-by-step processes that tie the chapters together."],
-            [t for t, _ in ex_pages]))
-        for t, body in ex_pages:
-            book.add(t, body, parent)
+    if data.get("caseStudies"):
+        parent = book.add("Part 4: Case studies", part_page(
+            "Part 4: Case studies", ["Longer, real-world scenarios that pull several chapters together. Each ends with questions and answers."],
+            [f"{cs['title']}" for cs in data["caseStudies"]]))
+        for cs in data["caseStudies"]:
+            book.add(f"Case study: {cs['title']}", case_study_page(cs), parent)
 
     # Part 5
     qgroups = by_category(usable_q, data["categories"])

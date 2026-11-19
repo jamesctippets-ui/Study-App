@@ -1,0 +1,33 @@
+{
+ "hero": "Maya Okafor",
+ "intro": [
+  "Maya Okafor works the service desk at Harbourline Logistics, a freight company with forty depots and one very tired IT team. She is good at closing tickets. Her manager, Dev, has just asked her to help the company adopt ITIL, and Maya has a confession: she only half knows what the word means.",
+  "Follow Maya as she learns the vocabulary, argues with a change board, maps a messy process, and finds out that ITIL is mostly common sense with better names."
+ ],
+ "beats": {
+  "language-of-value": [
+   "Maya’s monthly report is her pride: 500 tickets closed. Dev reads it and asks one question: “Do the depots feel better?” Maya checks. The depot managers say the label printers still jam every morning. Five hundred tickets closed, and nobody is happier. That gap, between what the help desk produces and what the depots actually get out of it, is the first thing ITIL teaches her to name."
+  ],
+  "roles-and-relationships": [
+   "Dev wants Maya in the room for a meeting with a software vendor, a depot manager and the finance director. Maya assumes they are all “the customer.” Dev gently corrects her: one person pays, one person uses the system every day, one person set the budget, and the vendor sells a product but does not run the service. The meeting only makes sense once Maya sorts out who plays which role."
+  ],
+  "value-system-and-principles": [
+   "At the change meeting, Maya watches a routine, pre-approved change wait for three signatures. It has been done a hundred times. Dev scribbles two of the seven guiding principles on a napkin: keep it simple and practical, and focus on value. Maya realises the board is not being careful, just slow. The napkin becomes her first reference card for how the whole ITIL system fits together."
+  ],
+  "governance-continual-improvement-practices": [
+   "Over a Monday full of checkout-style failures at the depot booking portal, Maya restarts a stuck process and the incident is closed in an hour. By Wednesday it happens again. Dev points out that restoring service and finding the cause are different jobs done by different practices. Maya opens a problem record, and, for the first time, starts a list of things to improve."
+  ],
+  "four-dimensions": [
+   "Harbourline decides to outsource its network monitoring. Maya expects it to be a quick contract. Then she realises the staff need retraining on the vendor’s alerts, the data has to flow into their own tools, the process for escalating has to change, and a new regulation is about to affect how they store records. One decision touches every side of the business at once."
+  ],
+  "product-service-lifecycle": [
+   "Dev asks Maya to lead a small idea: a self-service password reset tool for the depots. Maya jumps straight to buying software. Dev stops her and walks through the order of things: find out whether people want it, decide exactly what it must do, get or build it, test it into service, run it, and support it. Maya had been about to skip the first two steps."
+  ],
+  "streams-ai-and-frameworks": [
+   "Maya maps how a request travels from a depot to a fix and spots something odd: requests sit untouched in a queue for six hours, while the fix itself takes twenty minutes. The delay is the problem, not the technical skill. Meanwhile, management wants an AI assistant on the desk. Maya now has a way to look at both questions: where does the work wait, and where would automation actually help?"
+  ]
+ },
+ "epilogue": [
+  "Exam morning. Maya has a pen, a coffee and a head full of words she could not have defined a month ago: outcome, warranty, value stream, continual improvement. She thinks about the label printers. They had been the whole point all along: not tickets closed, but depots that work. She walks in ready."
+ ]
+}

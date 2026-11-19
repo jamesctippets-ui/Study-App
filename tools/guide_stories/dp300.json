@@ -1,0 +1,27 @@
+{
+ "hero": "Marcus Bell",
+ "intro": [
+  "Marcus Bell is the database administrator at Ledgerly, a small SaaS company that has just moved its customer databases to Azure. For years, Marcus ran SQL Server on machines he could touch. Now he has to learn which jobs are still his, which are Azure’s, and how to prove he is still needed. DP-300 is the map.",
+  "Follow Marcus through a year of growth at Ledgerly, one database problem at a time."
+ ],
+ "beats": {
+  "platform-resource-planning": [
+   "Ledgerly has 200 small customer databases whose busy times rarely overlap. Sizing each for its own peak would be very costly. Marcus learns about the three ways to run SQL on Azure, from fully managed to full control, about the two ways to buy capacity, and why a shared pool of resources can serve many quiet databases at the price of one busy one."
+  ],
+  "security-and-data-protection": [
+   "A new healthcare customer asks Ledgerly to protect a diagnosis column even from DBAs. Marcus has already turned on encryption at rest, but that does not stop a sysadmin from reading data. He learns about encrypting a column so the server never sees the plain value, hiding data from some users, limiting which rows each user sees, and firewall rules at two levels. Security turns out to have layers."
+  ],
+  "monitoring-and-diagnostics": [
+   "After a deployment, a report query slows to a crawl. Marcus tries his old profiler tool and discovers it will not connect. The supported route is different. He finds the query history, spots a plan that changed, and sets up alerts so the next slowdown reaches him before it reaches a customer. He learns where the numbers on CPU, I/O and memory come from."
+  ],
+  "query-performance-and-automation": [
+   "One stored procedure runs perfectly almost always, but a rare unusual input makes it crawl, and it runs thousands of times a minute. Marcus learns why a cached plan can be good for most values and terrible for a few, and what his options are without recompiling every call. He also hands the nightly maintenance to scheduled jobs so that his evenings stop belonging to Ledgerly."
+  ],
+  "high-availability-and-disaster-recovery": [
+   "Ledgerly lands its biggest customer, whose contract demands that service survives an entire datacentre going dark. Marcus compares built-in availability, zone redundancy, failover groups that move a set of related databases together, and backups for restoring to a point in time. He learns to ask two questions about every design: how long can we be down, and how much data can we lose?"
+  ]
+ },
+ "epilogue": [
+  "The night before the exam Marcus checks the Ledgerly dashboards one last time. Everything is green. He realises his job has changed from keeping servers alive to designing how they stay alive. On exam day he treats each scenario like a ticket from a real customer, and works through it the way he has all year."
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "hero": "Aisha Rahman",
+ "intro": [
+  "Aisha Rahman is the new Microsoft 365 administrator at Calloway & Pike, a regional engineering firm with six hundred staff. On her first Monday the CIO tells her two things: the company wants to roll out Copilot this quarter, and a security review is coming. Aisha is studying for AB-650 so she can do both without breaking anything.",
+  "Follow Aisha from setting up the tenant to making sure the company’s AI tools only see what they should."
+ ],
+ "beats": {
+  "tenant-configuration-management": [
+   "Calloway & Pike has just merged with a smaller firm, and Aisha inherits two tenants’ worth of mess. She verifies the new company domain, sets up group-based licensing so new hires get the right apps automatically, and works out which mailboxes should be shared and which groups should be Microsoft 365 groups. Her last task of the week: give an outside partner limited, time-bound admin rights instead of a full account."
+  ],
+  "identity-access-threat-protection": [
+   "A routine sign-in report shows a user signing in from two countries within an hour. Aisha has already set up Conditional Access to demand multi-factor authentication, but now she wants it to react to risky sign-ins automatically. She also puts her own admin role behind just-in-time activation, so no one, including her, has standing power. Then she checks how the mail filter handles suspicious attachments."
+  ],
+  "data-governance-compliance": [
+   "Legal asks Aisha for a rule: engineering drawings must be labelled confidential when created, kept for seven years, then deleted. She learns which tool handles labels, which handles keeping and deleting, and which stops sensitive data from leaving the company. Before turning on a new blocking rule she tests it in audit mode to see what it would catch. She is learning that governance is mostly about stages and testing."
+  ],
+  "copilot-licensing-and-grounding": [
+   "The pilot group of finance users gets Copilot licences through a group. In week one, one of them asks Copilot to summarise some files and it surfaces a budget spreadsheet that was shared far too widely years ago. Copilot did not break any rules; it only showed what the user could already open. Aisha realises Copilot makes oversharing visible, and that her real job is to fix the permissions underneath."
+  ],
+  "securing-and-governing-ai-agents": [
+   "Before the full rollout, Aisha runs a security assessment of how AI is being used. It finds Copilot answers quoting account numbers from an old shared spreadsheet. She labels it, adds a policy so Copilot cannot repeat labelled content, and gives each new AI agent its own identity so she can control and audit it. She also turns on logging of AI interactions. The CIO asks if the company is ready; Aisha finally has an answer."
+  ]
+ },
+ "epilogue": [
+  "The week before the exam, Aisha realises she has not just been studying, she has been doing the job: tenant, identity, data, Copilot, agents. The CIO is happy, the review passed, and the rollout is on schedule. She walks into the exam room, calm, because she has already seen all of it work."
+ ]
+}

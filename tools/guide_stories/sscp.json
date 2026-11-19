@@ -1,0 +1,36 @@
+{
+ "hero": "Luis Ortega",
+ "intro": [
+  "Luis Ortega is a systems administrator at Redhill Supply, a distributor with warehouses in four towns. Over the years he has become the person people ask about security, even though nobody ever gave him that job. He decides to make it official by preparing for the SSCP.",
+  "Follow Luis through the incidents, audits and late nights that teach him the practitioner’s side of security."
+ ],
+ "beats": {
+  "security-concepts-and-controls": [
+   "A finance employee at Redhill can add suppliers and approve payments. An audit finds a supplier that does not exist, paid every month for a year. Luis learns the principles that would have stopped it: separation of duties, least privilege, and change control, and the habit of recording what ‘normal’ looks like."
+  ],
+  "access-control-and-identity": [
+   "An engineer who moved departments still holds the roles of her old team, and three service accounts have not had a new password in years. Luis learns authentication factors, single sign-on and federation, the models for deciding who gets what, and why access that is not regularly reviewed tends to creep upwards."
+  ],
+  "risk-and-vulnerability-management": [
+   "The quarterly scan lists four hundred findings. Luis removes false alarms, ranks what is left by how exposed and valuable each system is, not just by a score, and fixes the internet-facing payment portal first. He learns how to measure and treat risk, and how a penetration test is scoped and agreed."
+  ],
+  "monitoring-logging-and-siem": [
+   "Two servers’ logon times are minutes out of order, making an intrusion timeline impossible to build. The cause is a clock that was never synchronised. Luis fixes that and sees a clear pattern of failed logons. He learns how logs are collected and protected, how detections work, and why a baseline of normal is the starting point for spotting abnormal."
+  ],
+  "incident-response-forensics-recovery": [
+   "At 7:40 on a Monday a workstation starts renaming files and shows a ransom note. Luis isolates it but leaves it powered on, captures memory, and escalates. The backup team disconnects the backup repository before it can be reached. Luis learns the incident stages, how to preserve evidence in the right order, and how continuity and recovery plans are measured."
+  ],
+  "cryptography-in-practice": [
+   "Two Redhill sites must send large nightly backups and have no shared secret. Luis learns how an asymmetric exchange can set up a fast symmetric session, how hashes and signatures prove integrity and origin, how certificates tie keys to identities, and why managing keys is the hard part."
+  ],
+  "network-security-controls": [
+   "The public web server and mail relay go into a protected zone with only the necessary ports open; the internal database stays inside. Luis learns how networks are layered and attacked, how segments and firewalls limit damage, how remote and wireless access are secured, and how monitoring keeps watch."
+  ],
+  "systems-endpoint-cloud-application-security": [
+   "Redhill’s warehouse app moves to rented virtual machines. Luis finds unpatched images, a storage area readable by anyone with a link, and warehouse staff reading company email on personal phones. He learns about hardening and patching, controls for endpoints and mobiles, shared responsibility in the cloud, and the safe coding habits that stop common attacks."
+  ]
+ },
+ "epilogue": [
+  "On the day of the exam, Luis thinks back through the year: the fake supplier, the ransom note, the unsynchronised clocks. Each one taught him a chapter of this book. He opens the first question and recognises the situation."
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "hero": "Lena Kowalski",
+ "intro": [
+  "Lena Kowalski works in a hospital’s reporting team. She is good with spreadsheets and has never built a database. When the hospital starts a data modernisation project, she volunteers, and then immediately wonders what she has signed up for. DP-900 is her way in.",
+  "Follow Lena as she learns where data lives, how it is stored, and how it becomes a dashboard someone trusts."
+ ],
+ "beats": {
+  "core-data-concepts": [
+   "Lena’s first week: the admissions system adds a patient record every few seconds, while finance runs a heavy report once a month over a whole year of billing. Two very different jobs, and she learns the names for them: many small transactions versus a few big analyses. She also meets the idea that data comes in tidy tables, loose documents, and files like images and scans, and that each needs different handling."
+  ],
+  "relational-data-on-azure": [
+   "The hospital’s existing system uses tables, keys that link patients to appointments, and a lot of overnight jobs. Lena learns why tables are split up to avoid repeating data, and how Azure offers several ways to host a SQL database. The team wants to move with as little rewriting as possible, so she learns which option keeps the old jobs working and which is a better fit for new apps."
+  ],
+  "non-relational-data-on-azure": [
+   "A research group wants to track which staff collaborate on which projects, including collaborators of collaborators. Lena finds that this kind of relationship question is awkward for tables and much easier in a graph. She tours the other storage options: documents, key-value tables, blobs for scans, files for shared folders, and a data lake for everything that arrives raw."
+  ],
+  "data-warehousing-and-pipelines": [
+   "Finance wants sales by region by quarter for the last five years. Lena learns that this means a warehouse built around facts and dimensions, filled by a pipeline. She compares transforming data before loading it with loading it raw and transforming afterwards, and finds out when each is sensible. She also sees why some data is processed overnight in batches and some as it arrives."
+  ],
+  "modern-analytics-platforms-and-bi": [
+   "The final piece is the executive dashboard. It needs to be live, but the underlying queries are occasional and unpredictable. Lena looks at the Azure services for analytics, streaming and a unified platform, and at the choice between importing data into a report or querying it live. She finally sees how every earlier chapter ends up on one screen."
+  ]
+ },
+ "epilogue": [
+  "On the morning of the exam Lena opens the hospital dashboard one last time. It is live, trusted and fed by the pipeline she now understands from end to end. The exam questions use unfamiliar names for familiar ideas, and Lena is surprised at how many of them she can picture."
+ ]
+}

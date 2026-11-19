@@ -1,0 +1,30 @@
+{
+ "hero": "Samira Joshi",
+ "intro": [
+  "Samira Joshi is an interface analyst at Lakeshore Regional Hospital. Behind every lab result, medication order and admission is a message passing between two systems. When it works, no one notices her. When it breaks, a clinician is waiting. This guide follows her as she learns the languages those systems speak.",
+  "This is not a certification track, but it is a skill that hospitals badly need."
+ ],
+ "beats": {
+  "hl7v2-message-anatomy": [
+   "The nightly charge feed has stalled. The live admissions feed is fine, so Samira knows the transport that carries messages and the batch file the charges depend on are separate paths. She learns how a message is built from segments and separators, how versions differ, and where vendors add their own custom fields."
+  ],
+  "hl7v2-message-types-acks": [
+   "A pharmacist reports that a medication order never appeared. Samira checks the log: the order went out and an acknowledgment came back saying it was accepted. So the receiving system took it, but something later went wrong. She learns the main message types and what each acknowledgment actually proves, and what it does not."
+  ],
+  "fhir-resource-model": [
+   "A developer needs a patient’s current medications and the patient’s details together. Samira shows how one request can bring back related resources in a single bundle, instead of many separate calls. She learns how FHIR splits data into resources, how they refer to each other, and how searching works."
+  ],
+  "smart-on-fhir-and-interop-rules": [
+   "A start-up builds a patient app that opens directly from an app store. Samira learns how such apps ask permission to read only specific data, how that differs from launching inside a clinician’s session, and how national rules about patient access and shared data classes pushed hospitals toward modern standards."
+  ],
+  "integration-engines-architecture-and-operations": [
+   "Radiology results stop appearing in the record, but nothing in the log is red. Samira sees only a quiet drop in message volume. A queue upstream has backed up. She learns how an integration engine routes and transforms messages, how it connects many systems through one hub, and which signals show trouble before anyone complains."
+  ],
+  "healthcare-data-governance": [
+   "A university asks for lab and medication data for a study. Samira learns that sharing data is a matter of who the patient is, what they consented to, and what level of identification is needed. She also learns how patients are matched across systems, why duplicates and mismatches matter, and why changes to live interfaces follow strict rules."
+  ]
+ },
+ "epilogue": [
+  "Samira’s interfaces still break occasionally, but she now knows which end to look at first, what each message proves, and who to call. The next time a clinician is waiting, she has an answer."
+ ]
+}

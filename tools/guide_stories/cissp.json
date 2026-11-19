@@ -1,0 +1,66 @@
+{
+ "hero": "Naomi Prescott",
+ "intro": [
+  "Naomi Prescott has been promoted to Head of Information Security at Halden Mutual, a mid-sized insurer. She was a strong technician, but the board is now asking her questions about risk, law, money and people, and none of them are about firewalls. She decides to prepare for the CISSP and to learn how to think like a leader.",
+  "Follow Naomi through her first year, from the board room to the server room and back."
+ ],
+ "beats": {
+  "security-governance-ethics-legal": [
+   "After a minor breach, the board asks why a weakness in the claims portal was written down a year ago and never fixed. Naomi learns that security starts at the top: who directs it, who is accountable, and what reasonable care looks like. She also meets the ethics she will be held to and the privacy laws that shape what she may do with customer data."
+  ],
+  "risk-management-threat-modeling": [
+   "Naomi is asked whether a $30,000-a-year web application firewall is worth it. She learns to put numbers on risk: what an attack is expected to cost each year before and after the control. She also learns how risk can be treated, how threats are modelled before systems are built, and how a vendor’s weaknesses become Halden’s own."
+  ],
+  "continuity-personnel-security": [
+   "The online claims platform must come back in twelve hours with at most five minutes of lost transactions. Naomi works out which kind of recovery site and replication can meet that, and how the plan is tested without disrupting business. She also looks at people: how to stop one person controlling a whole process, and what to do when staff join and leave."
+  ],
+  "asset-classification-data-lifecycle": [
+   "Halden is replacing a rack of drives that held customer records, and someone suggests selling them. Naomi learns that data needs an owner, a classification and a plan for the end of its life, and that ‘deleted’ is not the same as ‘gone’. A research group asks for data too, which teaches her about masking and protecting identity."
+  ],
+  "security-models-design-principles": [
+   "The firm builds a system for analysts who serve two competing banks. Naomi learns how formal security models prevent an analyst who has seen one bank’s files from seeing the other’s. She also learns the design principles that sit under all security decisions: least privilege, fail securely, defence in depth, and not trusting anything by default."
+  ],
+  "system-architectures-vulnerabilities": [
+   "Halden moves claims processing to small serverless functions and puts analytics boxes in its depots. One function turns out to have administrator rights to the whole account. Naomi learns the strengths and weaknesses of each architecture type, the hardware and software protections that sit beneath them, and why every system has a life cycle."
+  ],
+  "site-facility-environment": [
+   "The data room is moving to a basement next to a loading dock, with one water sprinkler, a single standby power unit and no environmental sensors. Naomi learns how sites are chosen and protected in layers, how fire, power and climate are controlled, and why the wiring closet matters as much as the server."
+  ],
+  "cryptography-pki": [
+   "A partner needs signed, confidential files. A recent breach also showed that unsalted password hashes were cracked in hours. Naomi learns the differences between symmetric and asymmetric encryption, hashing and signing, how certificates and authorities create trust, and how keys are looked after in practice."
+  ],
+  "network-architecture-segmentation": [
+   "After an attacker took over a web server and scanned the internal network, Naomi redesigns it in zones. She learns how network models describe what each device does, how segmentation and a screened subnet contain damage, and which perimeter defences look at which layer."
+  ],
+  "secure-communications-wireless": [
+   "Staff use full-tunnel VPN, administrators use an unencrypted remote login, and the Wi-Fi passphrase is known to someone who has left. Naomi replaces each weak link: encrypted protocols, central authentication, individual wireless logins, and protections for email against spoofing."
+  ],
+  "network-transport-edge-operations": [
+   "Voice calls stutter at peak hours across forty branches. Naomi learns how traffic is carried, what separates the planes of a network device, how performance is measured, and what is different in cloud networks. She also reviews a vendor who has a permanent remote account into Halden’s network."
+  ],
+  "iam-authentication-access-models": [
+   "Administrators should manage routers with per-command control and a full record, while branch staff reach core applications only from compliant devices in working hours. Naomi learns how people are identified and verified, how biometrics are measured, and the models that decide who can do what."
+  ],
+  "iam-federation-lifecycle-pam": [
+   "After an acquisition, there are sixty cloud apps, three directories, constant password resets, former contractors still active and a shared admin login. Naomi learns how federation and single sign-on reduce the pain, how access follows people as they join, move and leave, and how the most powerful accounts are controlled."
+  ],
+  "assessment-testing-audit": [
+   "Customers want proof that Halden’s controls work, and Naomi also wants to know whether an attacker could reach customer data. Those are two different questions. She learns when to commission an audit, a scan or a penetration test, how tests are scoped, and how to turn the results into decisions."
+  ],
+  "ops-monitoring-incident-forensics": [
+   "A workstation is calling a known malicious address at night. Naomi’s team confirms it, isolates it and preserves evidence in the right order, so it would stand up in court if needed. She learns how logging and monitoring catch problems, and how an incident moves from detection to lessons learned."
+  ],
+  "ops-resilience-change-physical": [
+   "A hospital client’s billing system has strict recovery targets. Naomi helps design the backups, replication and alternate site to meet them, tests the plan, and learns how patching and changes are controlled so that fixing one thing does not break another. Physical safety of staff turns out to be part of operations too."
+  ],
+  "sdlc-secure-development": [
+   "Halden’s developers ship every two weeks. Naomi works with them to put threat modelling into design, security checks into the pipeline, and a bill of materials into every release. She learns the common coding flaws, the tests that find them, and how to decide whether to trust software someone else wrote."
+  ],
+  "software-ecosystem-acquired-software": [
+   "A review of the new mobile app finds unlimited API query depth, a leaked key and a dependency pulled from the wrong registry. Naomi learns how the whole ecosystem fits together, from languages and libraries to build servers and repositories, and how to assess commercial, open-source and managed software before relying on it."
+  ]
+ },
+ "epilogue": [
+  "On the morning of the exam Naomi is calmer than she expected. She has been answering these questions all year in meetings, from the board down to the server room. The exam asks for the judgement of a manager, not a technician, and she has been practising exactly that."
+ ]
+}

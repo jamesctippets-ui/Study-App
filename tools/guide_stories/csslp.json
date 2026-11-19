@@ -1,0 +1,36 @@
+{
+ "hero": "Dmitri Volkov",
+ "intro": [
+  "Dmitri Volkov leads a small development team at a health-tech start-up. He is a good developer who has learned, painfully, that functioning software and safe software are different things. He is preparing for the CSSLP so he can build security into the product instead of bolting it on after release.",
+  "Follow Dmitri’s team through one app’s life, from the first requirement to the latest patch."
+ ],
+ "beats": {
+  "secure-software-concepts": [
+   "The team’s reporting service runs under the database owner’s account, caches permissions for the whole day, and shows a full stack trace to anyone who triggers an error. Dmitri learns to name the design principles each of those breaks: least privilege, complete mediation and failing safely."
+  ],
+  "secure-lifecycle-management": [
+   "The company is moving to continuous delivery, and the annual manual security review no longer fits. Dmitri learns how to keep expert review for architecture and risk, and move the repeatable checks into the pipeline. He meets the frameworks and maturity models that guide such a move, and the role of team champions."
+  ],
+  "secure-software-requirements": [
+   "The new mobile app will store diagnoses and appointment times for users in several countries. Before design begins, Dmitri has the data owner classify each field, writes security and privacy requirements, and, importantly, writes abuse cases: what a bad actor would try to do. Each requirement is traced forward to a test."
+  ],
+  "secure-architecture-design": [
+   "An order API sits behind a gateway with microservices talking to payments and a database. Dmitri draws the data flows, marks the trust boundaries, and asks what could go wrong at each one. He learns several ways to model threats, and how zero trust, strong service-to-service authentication and a smaller attack surface follow from the drawing."
+  ],
+  "secure-implementation": [
+   "A code review turns up a search page that builds SQL from user input, a comments page that echoes input into a web page, an export that accepts any record number, and an API key committed to the repository. Dmitri learns the defence for each, and why validating input, encoding output and protecting secrets are habits, not features."
+  ],
+  "secure-software-testing": [
+   "Before release of a service that parses uploaded documents, static analysis runs on every commit, dependencies are scanned, and a fuzzer has been feeding the parser malformed files. Dmitri learns what each kind of test finds and misses, and how test results feed the decision to release."
+  ],
+  "secure-deployment-operations": [
+   "A critical flaw is announced in a library used by the company’s internet-facing service, and attackers are already using it. Dmitri’s team searches its inventory, patches the exposed service first, and communicates clearly. He learns release, configuration and patch management, pipeline security, and how software is retired."
+  ],
+  "secure-supply-chain": [
+   "The same flaw shows up in four of the company’s products. Their bill of materials finds all four, and statements from product teams show two are not actually affected. Dmitri learns how open-source and third-party components are risks as well as benefits, how to detect and prevent supply-chain attacks, and what to ask of suppliers."
+  ]
+ },
+ "epilogue": [
+  "The app is out, patched and boring, which is the best thing Dmitri can say about security. On exam day he reads each scenario and asks the question he now asks of every feature: at which stage of the lifecycle should this have been caught?"
+ ]
+}

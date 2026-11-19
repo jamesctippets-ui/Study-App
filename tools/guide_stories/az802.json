@@ -1,0 +1,30 @@
+{
+ "hero": "Ravi Menon",
+ "intro": [
+  "Ravi Menon looks after the Windows servers at Delmar Manufacturing, a company with a head office, a factory and four branch sites. He knows his way around Active Directory, but now head office wants everything managed from Azure too, without moving anything out of the building. Ravi picks AZ-802 to keep up.",
+  "Follow Ravi through a year of hybrid server work, with his cluster, file servers and domain controllers."
+ ],
+ "beats": {
+  "active-directory-domain-services": [
+   "Delmar has just merged with a smaller firm and now has two forests. Ravi sets up a trust so users in either can sign in to the other, then tidies up who holds which special roles and how replication moves changes around. He learns how Group Policy settings stack up, how to recover an accidentally deleted account, and how to give services their own self-managing accounts."
+  ],
+  "hybrid-management-clustering-virtualization": [
+   "Head office wants alerts and policies applied to the branch Hyper-V hosts. Ravi connects them to Azure for management without moving any workload, and uses a web-based tool for daily tasks. He learns how to patch a failover cluster without downtime, how a cluster keeps its quorum with a witness in the cloud, and how virtual machines can move between hosts."
+  ],
+  "on-premises-hybrid-networking": [
+   "With a central site and several branches, Ravi redesigns DNS and DHCP. DNS zones that live in the directory replicate on their own and securely. DHCP pairs split or back up each other so that no branch loses its addresses. He also looks at how DNS can be signed to prove its answers are genuine, and at the choices for linking sites to Azure."
+  ],
+  "storage-file-services": [
+   "Users at three file servers are about to get a single path to their files, with the contents kept in sync between sites. Ravi learns how to join local disks into pools with resilience built in, why mirrored and parity layouts are different trade-offs, and how to reclaim space by removing duplicate data. He also compares file systems for the job they are given."
+  ],
+  "securing-windows-server": [
+   "After a security review, Ravi hardens the file servers and the most sensitive administrator accounts. Only approved programs may run, even for a local administrator; credentials in memory are protected; local administrator passwords are rotated automatically; and powerful accounts are limited in how they can sign in. A tool that watches the directory for signs of attack completes the picture."
+  ],
+  "monitoring-troubleshooting-windows-server": [
+   "Ravi’s last project is to make the hybrid fleet look the same, whether a server is in Azure or on the factory floor. Every server captures the same counters, sends them through the same agent, and alerts on the same rules. He also ties patch status into a single view. For the first time, a problem on any server gets the same kind of report."
+  ]
+ },
+ "epilogue": [
+  "On the day of the exam Ravi remembers the factory floor, the old file server in the corner, and the new view that shows every server in one place. Hybrid no longer sounds like a buzzword. He settles in and starts reading the first scenario."
+ ]
+}

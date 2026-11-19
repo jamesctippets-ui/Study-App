@@ -1,0 +1,30 @@
+{
+ "hero": "Fatima Zahra",
+ "intro": [
+  "Fatima Zahra has just been given a title she did not ask for: Identity and Access Administrator at Meridian Energy, a utility with offices in three countries. Every other security team depends on the thing she now owns: who can sign in, and to what. She starts SC-300 on her first day.",
+  "Follow Fatima as she builds Meridian’s identity layer one decision at a time."
+ ],
+ "beats": {
+  "entra-user-identities": [
+   "Meridian keeps its HR data in three regional directories. Sign-in must keep working even if one region’s servers go down overnight for maintenance. Fatima learns the options for syncing and signing in, how to delegate administration region by region, how groups can fill themselves from rules, and how to invite partners from outside the company."
+  ],
+  "authentication-methods-selfservice": [
+   "Fatima’s company has just rolled out passwordless sign-in, yet new hires still get a temporary password by email on day one. That is the weakest link in the chain. She learns about stronger methods, the one-time pass for onboarding, how password reset can be self-service, and how to defend against users being worn down by endless approval prompts."
+  ],
+  "conditional-access-risk": [
+   "Admins will soon need phishing-resistant sign-in. Fatima is afraid of locking out an admin who has not yet registered the right key. She learns to run the new policy in report-only mode first, read the results, and then turn it on. She also learns how risk signals, locations and authentication strength combine into one access decision."
+  ],
+  "workload-identities-apps": [
+   "Meridian’s deployments run from GitHub, using a secret that quietly expired one day and took down a release. Fatima learns to register apps, how services get their own identities, how to avoid long-lived secrets altogether, and the difference between permissions an app has for itself and permissions it borrows from the signed-in user."
+  ],
+  "identity-governance-pim": [
+   "On-call engineers need an admin role during their week on call, not forever. Fatima sets up eligibility with approval, justification and a time limit. She also builds packages of access that new staff and partners can request, reviews that remove stale access, and emergency accounts that are kept for the day everything else fails."
+  ],
+  "global-secure-access": [
+   "Meridian’s VPN is old and slow. Fatima learns how a client on each device can send internet, private and Microsoft traffic through a cloud service, with sign-in policies attached to each. Payroll gets its own per-app access with the strongest sign-in, and the VPN is finally retired."
+  ]
+ },
+ "epilogue": [
+  "Meridian’s identity layer now does what it should: the right people, the right access, for the right time. Fatima sits the exam knowing that every question is really asking, who is this, what do they need, and how long should they have it?"
+ ]
+}

@@ -1,0 +1,33 @@
+{
+ "hero": "Jordan Ellis",
+ "intro": [
+  "Jordan Ellis has just been hired as the first cloud administrator at Redfern Health, a hospital group that has been putting things in Azure for a year with nobody quite in charge. Jordan’s boss hands over a list: tidy up access, control costs, fix storage, size the virtual machines, deploy the patient portal safely, lock down the network, and make sure nothing is lost if something fails.",
+  "Follow Jordan through the first months as Azure administrator, and through the AZ-104 syllabus."
+ ],
+ "beats": {
+  "identities-access": [
+   "Radiology is growing from eight staff to thirty. Jordan sees that adding each person to a group by hand will not scale, so Jordan builds a group that fills itself from department data and attaches the licence to the group. An external consultant needs temporary access as a guest, and there is also a self-service password reset to set up so the help desk stops getting calls at 8 a.m."
+  ],
+  "governance-cost": [
+   "The lead engineer, Sam, needs to manage everything in one resource group and decide who else can join, but Jordan does not want to hand over company-wide ownership. Jordan assigns the right role at the right scope. Next, a policy that stops resources being created in the wrong region, and a budget that emails a warning before the month’s spend runs away."
+  ],
+  "storage-management": [
+   "A marketing contractor must upload files to a single container for 48 hours only. Jordan creates a time-limited, narrowly scoped access signature instead of handing over an account key. The same storage account gets a firewall, a rule that moves old blobs to cheaper tiers, and versioning with soft delete, so a mistaken overwrite can be undone."
+  ],
+  "vms-compute": [
+   "The patient records database needs steady, fast disks. The web front ends spike during business hours and are idle at night. Jordan picks a larger memory-optimised size with premium disks for the database, and spreads the front ends across availability zones. A VM that is too small can be resized, but Jordan learns it will restart, so that has to be planned."
+  ],
+  "app-hosting-iac": [
+   "The patient portal needs an update, and nobody wants to test it on the live site. Jordan deploys the new version to a staging slot, runs the checks against it, and swaps it into production in seconds, with the option to swap back. To stop the environment being rebuilt by hand next time, Jordan writes it down as a template that can be deployed again and previewed before it runs."
+  ],
+  "az104-networking": [
+   "After a scare, Jordan needs to block one suspicious address range from a subnet without breaking everything else. A deny rule only works if its priority number is lower than the allow rule it overrides. Jordan also peers two virtual networks, puts a load balancer in front of the web tier, and swaps public remote-desktop access for a secure bastion."
+  ],
+  "monitoring-recovery": [
+   "At 2 p.m. a bad script corrupts a database VM. Jordan restores it from that morning’s backup and loses a few hours of data, which is the price of the schedule. A regional outage is a different problem, which is what site recovery replication is for. Alerts and action groups mean the next problem finds Jordan, instead of the other way round."
+  ]
+ },
+ "epilogue": [
+  "Jordan’s manager has stopped sending lists. The hospital’s Azure estate is tidy, costs are predictable, and the next incident will be handled by alerts and backups. On exam day Jordan sees question after question that matches a situation from the past few months and realises the syllabus was the job description all along."
+ ]
+}

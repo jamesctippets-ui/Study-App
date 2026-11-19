@@ -1,0 +1,42 @@
+{
+ "hero": "Arjun Mehta",
+ "intro": [
+  "Arjun Mehta is a backend developer at Northfield Telecom. His team has been asked to build a support assistant and a nightly analysis job on top of Claude, and he has been put in charge of the design. He has built plenty of APIs, but nothing that decides for itself what to do next. He prepares for CCDV-F.",
+  "Follow Arjun from first prototype to a system that runs reliably at scale."
+ ],
+ "beats": {
+  "workflows-vs-agents-architecture": [
+   "Arjun’s first question is whether code or the model should steer. For the returns assistant, where order lookup, eligibility check and label creation always happen in that order, a fixed chain with a validation gate is best. For open-ended questions like ‘why was my order late?’, the model has to decide which tools to try. He learns the standard patterns and when to split work across helpers."
+  ],
+  "building-agents-claude-platform": [
+   "The bank next door wants an agent that reconciles ledgers overnight for hours, with nobody waiting. Arjun compares writing his own loop, using a ready-made agent SDK, and using a hosted option. He learns what the loop actually does, where limits, permissions and hooks belong, and how memory and context are handled over a long task."
+  ],
+  "messages-api-mechanics": [
+   "Invoice processing at Northfield needs fields extracted from supplier documents. Interactive uploads stream to a review screen; bulk back-office jobs go through a cheaper batch path. Arjun learns that the API is stateless, how to read the reason a reply stopped, how streaming works, why output must be parsed defensively, and how files are handled."
+  ],
+  "application-design-and-configuration": [
+   "Rolling out Claude Code to eighty engineers needs rules: managed settings that forbid bypassing permissions, a short project file of build commands and conventions, and pinned model versions. Arjun learns where instructions live in different interfaces, how configuration layers override each other, and why versioning prompts matters."
+  ],
+  "requirements-lifecycle-reliable-engineering": [
+   "‘Fast and accurate’ is not a requirement. Arjun turns it into a time-to-first-token target, an accuracy threshold on a labelled set and a cost per conversation. He chooses realtime for chat and batch for the churn job, and designs for rate limits with retries, backoff and bounded concurrency. He also plans for the day a model is retired."
+  ],
+  "model-selection-effort-caching-and-cost": [
+   "Three features, three very different needs: millions of short classifications, a trip-planning assistant and a heavy analysis. Arjun learns how tokens and context work, how to match model and effort to the task, why caching repeated context saves money, and how to measure cost per completed task rather than per call."
+  ],
+  "testing-debugging-and-claude-code-operation": [
+   "After a Friday deploy, about four percent of replies are rejected as invalid JSON. The on-call engineer does not touch the prompt. She compares logged requests before and after and finds that the change was in the code. Arjun learns to build evaluation sets, find silent failures, read traces, decide whether the model or the integration is at fault, and run Claude Code in automation."
+  ],
+  "prompt-and-context-engineering": [
+   "A contracts team puts thirty agreements and three tasks into one prompt, opens with the question, and shouts CRITICAL in capitals. Arjun restructures it: clear instructions, data in tagged sections, one task per step, examples that match the real cases. He learns how context grows, how to keep it lean, and how to check output and retry."
+  ],
+  "tool-definitions-results-and-mcp": [
+   "The support agent has fifty-five tools, each with a one-line description, and it keeps choosing the wrong one while spending thousands of tokens on definitions. Arjun learns to write descriptions that explain when to use each tool, to return errors the model can act on, to load tools on demand, and how MCP servers expose tools and data."
+  ],
+  "security-and-safety-for-claude-apps": [
+   "A law firm’s agent reads uploaded PDFs. One contains hidden text telling it to list another client’s matters. Arjun learns that content from outside is data, not instructions, and that safety comes in layers: least privilege, approvals for risky actions, hooks that enforce rules in code, and secrets that never enter the model’s context."
+  ]
+ },
+ "epilogue": [
+  "Northfield’s assistant has been live for a month and nobody has paged Arjun at night. On exam day, he reads each scenario the way he reads a design review: what is the requirement, which pattern fits, what could fail, and what guardrail would catch it?"
+ ]
+}

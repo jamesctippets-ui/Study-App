@@ -1,0 +1,36 @@
+{
+ "hero": "Victor Alvarez",
+ "intro": [
+  "Victor Alvarez is the security architect at Marlowe Retail, which has just decided to move its order system out of a managed hosting contract and into the public cloud. The CIO says security is ‘now the provider’s job’. Victor is quite sure that is not true, and he starts preparing for the CCSP to make the case properly.",
+  "Follow Victor as Marlowe’s cloud journey gives him one lesson after another."
+ ],
+ "beats": {
+  "cloud-foundations-shared-responsibility": [
+   "On the first day of the migration, the CIO cancels the quarterly access review, since the provider will handle security. Victor politely stops him. He learns what makes something cloud, how the service and deployment models change who is responsible for what, and why handing the system to a provider never hands over the accountability."
+  ],
+  "data-lifecycle-classification-dlp": [
+   "A developer copies real customer records into a test environment, and a test storage area is accidentally made public. Nobody had discovered or classified that data. Victor learns to map where data lives, label it, control how it moves, prevent leaks, and destroy it properly when it is no longer needed."
+  ],
+  "encryption-keys-tokenization": [
+   "A regulator insists that the provider must not be able to read Marlowe’s ledgers. Provider-managed keys will not satisfy that. Victor learns encryption at rest, in transit and in use, how keys are generated, stored, rotated and retired, and who holds them. He also learns when replacing data with a token is better than encrypting it."
+  ],
+  "secure-infrastructure-virtualization": [
+   "The platform team moves to Kubernetes. A scan finds the dashboard reachable from the internet, a base image two years old and a service account with cluster-wide powers. Victor learns how hypervisors and containers isolate workloads, how serverless changes the picture, and why the management plane is the crown jewels."
+  ],
+  "resilience-bcdr-risk": [
+   "Marlowe’s claims system runs in one availability zone, with nightly backups into the same account that holds production admin credentials. Ransomware gets both. Victor learns to design from impact analysis, to spread across zones and regions, to choose a recovery strategy to match the target, and to keep backups out of the attacker’s reach."
+  ],
+  "secure-sdlc-apis-iam": [
+   "A researcher shows that changing an account number in a request returns another customer’s transactions. Victor learns to build security into the lifecycle, to test in several ways, to treat APIs as the front door, to be aware of risks specific to AI assistants, and to set up identity so access is brief and traceable."
+  ],
+  "cloud-security-operations-ir": [
+   "At 2 a.m. a key is used from two continents and a new virtual machine appears in an unused region. Victor revokes sessions, quarantines the machine and preserves evidence. He learns how logging, posture checks and detection work in the cloud, and how an investigation differs when the hardware is not yours."
+  ],
+  "legal-privacy-risk-audit": [
+   "Marlowe’s European arm picks a provider based in another country. Counsel raises three issues: staff outside the region can reach personal data, subprocessors are not listed, and breach notification terms are vague. Victor learns the legal duties, how contracts and reports provide assurance, and how to manage a supplier as a risk."
+  ]
+ },
+ "epilogue": [
+  "The migration is done and the quarterly access review is back on the calendar. The CIO has stopped saying ‘the provider’s job’. On exam day Victor reads each scenario as a conversation he has already had at Marlowe: who is responsible, what could go wrong, and what proves it."
+ ]
+}

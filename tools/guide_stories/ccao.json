@@ -1,0 +1,42 @@
+{
+ "hero": "Rosa Martinelli",
+ "intro": [
+  "Rosa Martinelli is an operations coordinator at Alder & Finch, a mid-sized services firm. Her team has been given access to Claude, and her manager has asked her to be the person who shows everyone else how to use it well. Rosa has used it a bit, with mixed results. She starts the CCAO-F to learn what ‘well’ actually means.",
+  "Follow Rosa as she goes from fiddling with prompts to running a team that uses Claude responsibly."
+ ],
+ "beats": {
+  "prompting-clear-requests": [
+   "Rosa’s first job is an announcement about a new expense policy for 400 field staff. Her first prompt, one short sentence, produces a stiff, generic memo. She tries again with the readers, the purpose, the tone, the length, the format and a sample of the house style, and the result is usable. The difference is not magic, just a clear brief."
+  ],
+  "prompting-decompose-iterate": [
+   "Rosa has 200 free-text survey comments and a board meeting on Friday. She does not ask for a report; she asks Claude to group the comments into themes with example quotes, reads the result, merges two themes, and moves on to the next step. Big jobs go better in stages that she can check."
+  ],
+  "evaluation-hallucinations-validation": [
+   "For a board slide, Rosa asks for three statistics with sources. Claude gives confident numbers. She asks for the passage behind each figure and tries to find each one in the real report. One of them is not there. Rosa learns what Claude is and is not good at, and how to check what matters before it reaches anyone else."
+  ],
+  "evaluation-bias-review-formats": [
+   "Rosa asks for screening criteria for a customer-service hiring round and the draft includes phrases like ‘digital native’ and ‘high energy’. She asks for criteria based on the job, tests by swapping details to see whether the output changes, and decides where a person must review before anything is used. She also learns when a reply, a document or a file is the right shape of answer."
+  ],
+  "models-features-models-context": [
+   "Alder & Finch uses Claude for three jobs: tagging hundreds of expense lines each night, drafting a weekly update, and thinking through hard questions. Rosa learns that the small, fast model suits the first, a stronger one with more effort suits the third, and that long conversations need a fresh start with a summary rather than an ever-growing history."
+  ],
+  "workflow-design-integrate-communicate": [
+   "An analyst spends two days each month turning store managers’ emails into a summary for executives. Rosa helps her try Claude on a sample, measure how long it takes now, keep a person approving the final version, and explain the new process to colleagues honestly, including what it cannot do."
+  ],
+  "knowledge-projects-instructions-connectors": [
+   "A training manager sets up a shared Project for answering client questions: current guides and prices as knowledge, instructions that say how to answer and what to do when the answer is not in the files. Rosa learns how instructions, files and connected tools fit together, and why a configuration needs testing and keeping up to date."
+  ],
+  "governance-data-privacy-regulated": [
+   "A coordinator asks which departments log the most overtime. The payroll export has names, home addresses and ID numbers. Rosa checks the AI policy, and the answer is: send only what is needed, with names and identifiers removed, through the approved tool. She learns how data is classified, what must never be pasted in, and what to do if something is sent by mistake."
+  ],
+  "governance-use-cases-policy-ethics": [
+   "A hiring manager wants Claude to rank 400 applications and send automatic rejections to the bottom half. The HR lead explains that employment is a high-risk area, and instead uses Claude to summarise each application against the posting, with a person making every decision. Rosa learns where the line sits between help and decision, and how to be open about AI use."
+  ],
+  "troubleshooting-diagnose-iterate-optimize": [
+   "The support team’s saved prompt writes replies that sound cold to upset customers, and the layout varies. Rosa collects ten real examples, works out whether the problem is missing context, conflicting instructions or no sample, changes one thing at a time and measures. She learns when to switch approach and when a person should take over."
+  ]
+ },
+ "epilogue": [
+  "A month later, Rosa’s team has a short guide, a few trusted projects and a habit of checking before they send. On exam day she imagines each scenario as a colleague’s question at her desk, and answers it the way she has been answering them for months."
+ ]
+}

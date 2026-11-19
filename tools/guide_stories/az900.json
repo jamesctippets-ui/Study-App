@@ -1,0 +1,33 @@
+{
+ "hero": "Tomás Rivera",
+ "intro": [
+  "Tomás Rivera runs IT for a family bakery with three shops. He has three ageing servers in a back room, a stack of renewal quotes, and a nephew who says, “Why don’t you just move it to the cloud?” Tomás does not know where to start, so he decides to learn Azure properly and take the AZ-900 exam.",
+  "Follow Tomás as he moves the bakery’s systems, one decision at a time, from the back room to Azure."
+ ],
+ "beats": {
+  "cloud-fundamentals": [
+   "The first renewal quote lands on Tomás’s desk: replacement servers for the back room, paid up front. He asks how the cloud is different. The answer starts with money: instead of buying hardware once, you rent what you use every month. Then it gets into who looks after what, and whether the bakery needs a virtual machine, a managed platform or just a finished app. Tomás begins to see that the choice is about how much he wants to manage."
+  ],
+  "governance-structure": [
+   "Tomás creates an Azure subscription and quickly makes a mess: shop systems, the website and some experiments all in one place. His nephew shows him how to organise by subscriptions and resource groups, and how a single rule at the top can apply everywhere below it. Tomás also learns that Azure regions come in pairs, which matters when he wonders where the bakery’s data should live."
+  ],
+  "compute-hosting": [
+   "The bakery’s nightly sales report takes fifteen minutes to run. Tomás’s first plan is a virtual machine that is switched on all day. His nephew points out he would be paying for twenty-three hours of nothing. Tomás looks at the other options: containers, functions that run only when needed, and ways to keep a virtual machine running if one machine fails. The report job suddenly looks very cheap."
+  ],
+  "networking": [
+   "The finance office and the online shop are both going into Azure, and Tomás does not want them reaching each other. He learns that a virtual network is like the bakery’s own private street with separate buildings, and that rules control who can walk between them. When the second shop needs a link to Azure, he compares a secure tunnel over the internet against a private line, and picks one by price and need."
+  ],
+  "storage": [
+   "Seven years of order records have to be kept for tax reasons, but nobody opens anything older than a year. Tomás learns Azure storage has different kinds, files, blobs, queues and tables, and different tiers, from hot and fast to cold and cheap. He moves the old records to the cheapest tier and watches the monthly estimate drop. He also learns how many copies, and where, depends on how much a lost file would hurt."
+  ],
+  "identity-security": [
+   "A new shop assistant, Priya, needs to restart the till server but nothing else. Tomás hands out access only at the level she needs. He also turns on a second check whenever someone signs in from outside the shop. His nephew calls the mindset “never trust, always verify.” Tomás likes it because it sounds like locking the till drawer even when you know everyone."
+  ],
+  "cost-policy-monitoring": [
+   "The bill comes in higher than Tomás expected. Because he tagged every resource with the shop that owns it, he can see that one shop’s test system is the culprit. He sets a rule so nothing gets built outside the right region, adds a lock so the main database cannot be deleted by accident, and sets up alerts. Running Azure turns out to be less about building things and more about looking after them."
+  ]
+ },
+ "epilogue": [
+  "On exam day Tomás realises he has already done most of it for real: he chose where things run, who can reach them, how data is stored, and how to keep an eye on the bill. The three old servers are still in the back room, switched off, collecting dust. He sits down at the exam screen and smiles."
+ ]
+}

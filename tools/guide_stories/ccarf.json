@@ -1,0 +1,51 @@
+{
+ "hero": "Sofia Lindqvist",
+ "intro": [
+  "Sofia Lindqvist is a software architect at Kestrel Parcel, a delivery company that is building a returns assistant, a research agent and a code-review pipeline on top of Claude. She has to decide how agents loop, how tools are described, how instructions are shared across teams and what a human should check. She prepares for the CCAR-F while she builds.",
+  "Follow Sofia as the pieces come together, one design decision at a time."
+ ],
+ "beats": {
+  "agentic-loop-and-task-decomposition": [
+   "The first prototype of the returns assistant quits halfway whenever a reply contains text. Sofia finds the loop was stopping on the wrong signal. She rebuilds it to continue while the model asks to use a tool, to finish only when it signals it is done, and to send the full history back each time. She also learns when a fixed chain of steps beats letting the model decide."
+  ],
+  "coordinator-subagent-orchestration": [
+   "The research agent has to answer how small cities prepare for extreme heat. Sofia has a coordinator split the question into three parts and launch a helper for each. The helpers know nothing except what they are told, so each gets a clear brief. Sofia learns how to define helpers, pass context explicitly, run them in parallel, and refine the results."
+  ],
+  "enforcement-hooks-and-handoffs": [
+   "The billing agent must never apply a credit before the account has been verified. A line in the prompt asking nicely is not enough. Sofia adds a gate in code that blocks the credit tool until the lookup has returned a verified account, and a hook that checks limits before anything runs. She also designs the hand-off to a human, with everything they need in one place."
+  ],
+  "sessions-resume-and-fork": [
+   "An engineer names a session and spends two days mapping the billing module. A teammate then refactors five files. Sofia learns to resume and tell the agent which files changed instead of trusting stale results, to fork a session to try two approaches from the same starting point, and when to start fresh with a summary."
+  ],
+  "tool-design-errors-and-distribution": [
+   "The logistics assistant sends tracking numbers to the order-lookup tool, because both descriptions are one line long. Sofia rewrites them with accepted formats, examples and when not to use each. She learns to return errors that tell the agent what to do next, to give each role only the tools it needs, and what forcing a tool choice does and does not guarantee."
+  ],
+  "mcp-integration-and-built-in-tools": [
+   "The team commits a shared tool-server configuration that reads its token from an environment variable, while one developer keeps an experimental server in her personal settings. Sofia learns how scope decides who sees which server, how tools, resources and prompts differ, and when to use search, read, write or edit in the built-in toolkit."
+  ],
+  "claude-md-hierarchy-rules-and-imports": [
+   "The monorepo’s instruction file has grown to 550 lines, and a new hire reports that Claude ignores naming rules everyone else sees, because a senior engineer saved them in a personal file. Sofia learns where instruction files live and who receives them, how to split them into modules, and how to scope rules to the paths they apply to."
+  ],
+  "skills-commands-and-plan-mode": [
+   "The platform team ships three workflows. One produces long intermediate output, so it runs in its own forked context. One is dangerous, so only a person can trigger it. Sofia learns when something belongs in a skill and when in an instruction file, and when plan mode is better than just doing the work."
+  ],
+  "iterative-refinement-and-ci-pipelines": [
+   "The code-review pipeline runs Claude non-interactively and posts each finding as a comment. Sofia learns to give concrete input and output examples, to drive work with tests, to let the model interview her before building, and to run it in automation with structured output and a fresh instance for each job."
+  ],
+  "criteria-few-shot-and-schema-output": [
+   "The invoice reader returns bad JSON one time in two hundred, invents order numbers for suppliers who have none, and labels vague tickets with confident guesses. Sofia replaces vague instructions with explicit criteria, adds examples for borderline cases, and moves from asking for JSON to enforcing a schema with fields that may be empty."
+  ],
+  "validation-retry-batch-and-review": [
+   "An insurer extracts data from forty thousand scanned documents a week. Sofia has results checked in code, retries failures once with the exact error, and sends what still fails to a person. The overnight volume goes through the batch interface at lower cost, and an independent pass reviews the risky ones."
+  ],
+  "context-facts-escalation-and-errors": [
+   "A customer disputes three orders in one conversation. Sofia keeps a short facts block with each order’s details so they survive summarising, and trims huge lookup results to the fields that matter. She also learns when the agent must hand over to a human, and how a failure travels back from a helper with enough detail to act on."
+  ],
+  "long-sessions-human-review-and-provenance": [
+   "Mapping a million-line billing system takes a coordinator and five exploration helpers. They write notes to files and save state so that a crash on day two does not lose everything. Sofia learns how to keep long work coherent, how to sample and calibrate human review, and how to keep every claim traceable to its source."
+  ]
+ },
+ "epilogue": [
+  "Kestrel’s agents are in production with gates, hooks, clear tool descriptions and a human in the right places. On exam day Sofia notices that each question is really a design review: what is the failure, and which mechanism, enforced in code and not just asked for in a prompt, prevents it?"
+ ]
+}
