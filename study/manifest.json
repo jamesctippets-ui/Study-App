@@ -1,0 +1,531 @@
+{
+ "pack": "cert-study-eink",
+ "v": 1,
+ "built": "2026-11-21",
+ "tracks": [
+  {
+   "key": "itil",
+   "label": "ITIL",
+   "subtitle": "Foundation, Version 5",
+   "categories": [
+    "Key Terms",
+    "Value System",
+    "Four Dimensions",
+    "Lifecycle",
+    "Value Streams",
+    "AI",
+    "Other Frameworks"
+   ],
+   "cards": 100,
+   "questions": 123,
+   "exam": {
+    "length": 40,
+    "minutes": 60,
+    "passPct": 65
+   }
+  },
+  {
+   "key": "az900",
+   "label": "AZ-900",
+   "subtitle": "Azure Fundamentals",
+   "categories": [
+    "Cloud Concepts",
+    "Architecture & Services",
+    "Management & Governance"
+   ],
+   "cards": 147,
+   "questions": 165,
+   "exam": {
+    "length": 50,
+    "minutes": 45,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "ab650",
+   "label": "AB-650",
+   "subtitle": "M365 & AI Services Administrator",
+   "categories": [
+    "Configure & Manage Tenants and Workloads",
+    "Govern & Secure Tenants and Workloads",
+    "Manage & Secure AI Services"
+   ],
+   "cards": 197,
+   "questions": 163,
+   "exam": {
+    "length": 52,
+    "minutes": 100,
+    "passPct": 70
+   }
+  },
+  {
+   "key": "az104",
+   "label": "AZ-104",
+   "subtitle": "Azure Administrator",
+   "categories": [
+    "Identity & Governance",
+    "Storage",
+    "Compute",
+    "Networking",
+    "Monitor & Maintain"
+   ],
+   "cards": 156,
+   "questions": 164,
+   "exam": {
+    "length": 50,
+    "minutes": 100,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "dp900",
+   "label": "DP-900",
+   "subtitle": "Azure Data Fundamentals",
+   "categories": [
+    "Core Data Concepts",
+    "Relational Data on Azure",
+    "Non-Relational Data on Azure",
+    "Analytics Workloads on Azure"
+   ],
+   "cards": 143,
+   "questions": 155,
+   "exam": {
+    "length": 50,
+    "minutes": 45,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "sc900",
+   "label": "SC-900",
+   "subtitle": "Security, Compliance & Identity Fundamentals",
+   "categories": [
+    "Security, Compliance & Identity Concepts",
+    "Microsoft Entra",
+    "Microsoft Security Solutions",
+    "Microsoft Compliance Solutions"
+   ],
+   "cards": 126,
+   "questions": 139,
+   "exam": {
+    "length": 50,
+    "minutes": 45,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "dp300",
+   "label": "DP-300",
+   "subtitle": "Azure Database Administrator",
+   "categories": [
+    "Plan & Implement Data Platform Resources",
+    "Implement a Secure Environment",
+    "Monitor & Configure Database Resources",
+    "Optimize Query Performance (within Monitor, configure, and optimize)",
+    "Configure & Manage Automation of Tasks",
+    "Plan & Configure HA/DR"
+   ],
+   "cards": 135,
+   "questions": 141,
+   "exam": {
+    "length": 52,
+    "minutes": 100,
+    "passPct": 70
+   }
+  },
+  {
+   "key": "az305",
+   "label": "AZ-305",
+   "subtitle": "Azure Solutions Architect Expert",
+   "categories": [
+    "Identity, Governance & Monitoring",
+    "Data Storage Solutions",
+    "Business Continuity",
+    "Infrastructure Solutions"
+   ],
+   "cards": 175,
+   "questions": 181,
+   "exam": {
+    "length": 50,
+    "minutes": 120,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "az802",
+   "label": "AZ-802",
+   "subtitle": "Windows Server Administrator",
+   "categories": [
+    "Deploy and Manage AD DS",
+    "Manage Windows Server Instances & Workloads in a Hybrid Environment",
+    "Manage Virtual Machines",
+    "Implement & Manage On-Premises and Hybrid Networking",
+    "Manage Storage & File Services",
+    "Secure Windows Server Infrastructure",
+    "Monitor & Troubleshoot Windows Server Environments"
+   ],
+   "cards": 150,
+   "questions": 149,
+   "exam": {
+    "length": 60,
+    "minutes": 120,
+    "passPct": 70
+   }
+  },
+  {
+   "key": "az140",
+   "label": "AZ-140",
+   "subtitle": "Azure Virtual Desktop Specialty",
+   "categories": [
+    "Plan and Implement an Azure Virtual Desktop Infrastructure",
+    "Plan and Implement Identity and Security",
+    "Plan and Implement User Environments and Apps",
+    "Monitor and Maintain an Azure Virtual Desktop Infrastructure"
+   ],
+   "cards": 156,
+   "questions": 150,
+   "exam": {
+    "length": 50,
+    "minutes": 100,
+    "passPct": 70
+   }
+  },
+  {
+   "key": "md102",
+   "label": "MD-102",
+   "subtitle": "Endpoint Administrator",
+   "categories": [
+    "Manage and Maintain Devices",
+    "Prepare Infrastructure for Devices",
+    "Protect Devices",
+    "Manage and Secure Applications",
+    "Optimize Endpoint Operations by Using Automation, Monitoring, and Reporting"
+   ],
+   "cards": 166,
+   "questions": 159,
+   "exam": {
+    "length": 55,
+    "minutes": 100,
+    "passPct": 70
+   }
+  },
+  {
+   "key": "sc300",
+   "label": "SC-300",
+   "subtitle": "Identity & Access Administrator",
+   "categories": [
+    "Implement and Manage User Identities",
+    "Implement Authentication and Access Management (incl. Global Secure Access)",
+    "Plan and Implement Workload Identities (apps, agents, Defender for Cloud Apps)",
+    "Plan and Implement Identity Governance"
+   ],
+   "cards": 149,
+   "questions": 150,
+   "exam": {
+    "length": 54,
+    "minutes": 100,
+    "passPct": 70
+   }
+  },
+  {
+   "key": "sc200",
+   "label": "SC-200",
+   "subtitle": "Security Operations Analyst",
+   "categories": [
+    "Manage a Security Operations Environment",
+    "Respond to Security Incidents",
+    "Perform Threat Hunting"
+   ],
+   "cards": 146,
+   "questions": 143,
+   "exam": {
+    "length": 54,
+    "minutes": 100,
+    "passPct": 70
+   }
+  },
+  {
+   "key": "sc500",
+   "label": "SC-500",
+   "subtitle": "Cloud & AI Security Engineer",
+   "categories": [
+    "Identity, Access & Governance",
+    "Storage, Databases & Networking",
+    "Compute & AI Workload Security",
+    "Security Posture & Monitoring"
+   ],
+   "cards": 179,
+   "questions": 178,
+   "exam": {
+    "length": 70,
+    "minutes": 120,
+    "passPct": 70
+   }
+  },
+  {
+   "key": "cloudplus",
+   "label": "Cloud+",
+   "subtitle": "CompTIA Cloud+ (CV0-004)",
+   "categories": [
+    "Cloud Architecture & Design",
+    "Security",
+    "Deployment",
+    "Operations & Support",
+    "Troubleshooting"
+   ],
+   "cards": 125,
+   "questions": 116,
+   "exam": {
+    "length": 90,
+    "minutes": 90,
+    "passPct": 83
+   }
+  },
+  {
+   "key": "ehrintegration",
+   "label": "EHR Integration",
+   "subtitle": "Healthcare Interoperability Concepts (not a certification)",
+   "categories": [
+    "HL7 v2 Messaging",
+    "FHIR & Modern APIs",
+    "Integration Engines & Architecture",
+    "Healthcare Data Governance & Real-World Practice"
+   ],
+   "cards": 124,
+   "questions": 116,
+   "exam": {
+    "length": 44,
+    "minutes": 60,
+    "passPct": 80
+   }
+  },
+  {
+   "key": "ccna",
+   "label": "CCNA",
+   "subtitle": "Cisco Certified Network Associate (200-301)",
+   "categories": [
+    "Network Fundamentals",
+    "Network Access",
+    "IP Connectivity",
+    "IP Services",
+    "Security Fundamentals",
+    "Automation and Programmability"
+   ],
+   "cards": 233,
+   "questions": 201,
+   "exam": {
+    "length": 60,
+    "minutes": 75,
+    "passPct": 82
+   }
+  },
+  {
+   "key": "isc2cc",
+   "label": "ISC2 CC",
+   "subtitle": "Certified in Cybersecurity",
+   "categories": [
+    "Security Principles",
+    "Security Governance",
+    "Identity And Access Management (IAM) Concepts",
+    "Networking and Cloud Security Concepts",
+    "Security Operations and Incident Response"
+   ],
+   "cards": 240,
+   "questions": 256,
+   "exam": {
+    "length": 50,
+    "minutes": 60,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "sscp",
+   "label": "SSCP",
+   "subtitle": "ISC2 Systems Security Certified Practitioner",
+   "categories": [
+    "Security Concepts and Practices",
+    "Access Controls",
+    "Risk Identification, Monitoring and Analysis",
+    "Incident Response and Recovery",
+    "Cryptography",
+    "Network and Communications Security",
+    "Systems and Application Security"
+   ],
+   "cards": 315,
+   "questions": 368,
+   "exam": {
+    "length": 60,
+    "minutes": 80,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "cissp",
+   "label": "CISSP",
+   "subtitle": "ISC2 Certified Information Systems Security Professional",
+   "categories": [
+    "Security and Risk Management",
+    "Asset Security",
+    "Security Architecture and Engineering",
+    "Communication and Network Security",
+    "Identity and Access Management (IAM)",
+    "Security Assessment and Testing",
+    "Security Operations",
+    "Software Development Security"
+   ],
+   "cards": 534,
+   "questions": 408,
+   "exam": {
+    "length": 75,
+    "minutes": 110,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "ccsp",
+   "label": "CCSP",
+   "subtitle": "ISC2 Certified Cloud Security Professional",
+   "categories": [
+    "Cloud Concepts, Architecture and Design",
+    "Cloud Data Security",
+    "Cloud Platform and Infrastructure Security",
+    "Cloud Application Security",
+    "Cloud Security Operations",
+    "Legal, Risk and Compliance"
+   ],
+   "cards": 329,
+   "questions": 357,
+   "exam": {
+    "length": 65,
+    "minutes": 100,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "cgrc",
+   "label": "CGRC",
+   "subtitle": "ISC2 Governance, Risk and Compliance",
+   "categories": [
+    "Security and Privacy Governance, Risk Management, and Compliance Program",
+    "Scope of the System",
+    "Selection and Approval of Framework, Security, and Privacy Controls",
+    "Implementation of Security and Privacy Controls",
+    "Assessment/Audit of Security and Privacy Controls",
+    "System Compliance",
+    "Compliance Maintenance"
+   ],
+   "cards": 248,
+   "questions": 287,
+   "exam": {
+    "length": 60,
+    "minutes": 90,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "csslp",
+   "label": "CSSLP",
+   "subtitle": "ISC2 Certified Secure Software Lifecycle Professional",
+   "categories": [
+    "Secure Software Concepts",
+    "Secure Software Lifecycle Management",
+    "Secure Software Requirements",
+    "Secure Software Architecture and Design",
+    "Secure Software Implementation",
+    "Secure Software Testing",
+    "Secure Software Deployment, Operations, Maintenance",
+    "Secure Software Supply Chain"
+   ],
+   "cards": 272,
+   "questions": 330,
+   "exam": {
+    "length": 60,
+    "minutes": 90,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "ccao",
+   "label": "CCAO-F",
+   "subtitle": "Claude Certified Associate – Foundations",
+   "categories": [
+    "Prompting and Task Execution",
+    "Output Evaluation and Validation",
+    "Product and Model Selection",
+    "Workflow Integration and Solution Design",
+    "Configuration and Knowledge Management",
+    "Governance, Risk, and Responsible Use",
+    "Troubleshooting and Optimization"
+   ],
+   "cards": 234,
+   "questions": 271,
+   "exam": {
+    "length": 60,
+    "minutes": 120,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "ccdv",
+   "label": "CCDV-F",
+   "subtitle": "Claude Certified Developer – Foundations",
+   "categories": [
+    "Agents and Workflows",
+    "Applications and Integration",
+    "Claude Code",
+    "Evaluation, Testing and Debugging",
+    "Model Selection and Optimization",
+    "Prompt and Context Engineering",
+    "Security and Safety",
+    "Tools and MCPs"
+   ],
+   "cards": 269,
+   "questions": 292,
+   "exam": {
+    "length": 53,
+    "minutes": 120,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "ccarf",
+   "label": "CCAR-F",
+   "subtitle": "Claude Certified Architect – Foundations",
+   "categories": [
+    "Agentic Architecture and Orchestration",
+    "Tool Design and MCP Integration",
+    "Claude Code Configuration and Workflows",
+    "Prompt Engineering and Structured Output",
+    "Context Management and Reliability"
+   ],
+   "cards": 289,
+   "questions": 344,
+   "exam": {
+    "length": 60,
+    "minutes": 120,
+    "passPct": 75
+   }
+  },
+  {
+   "key": "ccarp",
+   "label": "CCAR-P",
+   "subtitle": "Claude Certified Architect – Professional",
+   "categories": [
+    "Solution Design and Architecture",
+    "Claude Models, Prompting and Context Engineering",
+    "Integration",
+    "Evaluation, Testing and Optimization",
+    "Governance, Safety and Risk Management",
+    "Stakeholder Communication and Lifecycle Management",
+    "Developer Productivity and Operational Enablement"
+   ],
+   "cards": 242,
+   "questions": 270,
+   "exam": {
+    "length": 63,
+    "minutes": 120,
+    "passPct": 75
+   }
+  }
+ ]
+}
