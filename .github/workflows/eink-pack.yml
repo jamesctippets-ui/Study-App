@@ -1,0 +1,61 @@
+name: E-ink study pack
+
+# Builds the e-ink study pack (tools/eink_pack.py, every track) and publishes it as
+# study-pack.zip on the rolling "eink-study-pack" release, so the reader's flasher
+# (CrossBlink's Sticky Hub) can download it without a local checkout:
+#   https://github.com/<owner>/<repo>/releases/download/eink-study-pack/study-pack.zip
+# The zip holds one folder, study/, laid out as EINK_STUDY_PACK.md describes.
+
+on:
+  push:
+    branches: [claude/certification-study-app-n6bst5]
+    paths:
+      - "data/**"
+      - "src/**"
+      - "build.py"
+      - "tools/eink_*.py"
+      - ".github/workflows/eink-pack.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: eink-study-pack
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Node builds the blanked flashcard prompts.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build
+        run: python3 build.py
+
+      - name: Write the study pack
+        run: |
+          set -euo pipefail
+          python3 tools/eink_pack.py --out pack-out
+          (cd pack-out && zip -qr ../study-pack.zip study)
+          ls -l study-pack.zip
+
+      - name: Publish to the eink-study-pack release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          notes="Latest e-ink study pack, rebuilt from ${GITHUB_SHA::7} on $(date -u +%Y-%m-%d). Unzip so study/ is at the root of the SD card, or send it with Sticky Hub."
+          if gh release view eink-study-pack >/dev/null 2>&1; then
+            gh release edit eink-study-pack --notes "$notes"
+          else
+            gh release create eink-study-pack --prerelease --title "E-ink study pack" --notes "$notes" --target "$GITHUB_SHA"
+          fi
+          gh release upload eink-study-pack study-pack.zip --clobber
