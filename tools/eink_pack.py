@@ -8,7 +8,7 @@ did to /study/progress.jsonl. Data & Progress in the app imports that file ("Imp
 
 It writes, under <out>/study/:
 
-  manifest.json              the tracks in the pack, their categories and counts
+  manifest.json              the tracks in the pack, their categories, counts and practice-test settings
   <track>/cards.jsonl        one flashcard per line
   <track>/questions.jsonl    one question per line (image questions are left out)
   state.json                 only with --progress: your current flashcard schedule, so the reader starts in step
@@ -85,6 +85,14 @@ def pack_track(out, key, data):
     return entry, card_ids, question_ids, skipped
 
 
+def exam_settings(cfg):
+    """The track's practice-test settings for the reader: question count, time limit and pass mark, or None."""
+    if not isinstance(cfg, dict):
+        return None
+    exam = {x: cfg[x] for x in ("length", "minutes", "passPct") if isinstance(cfg.get(x), (int, float)) and cfg[x] > 0}
+    return exam if "length" in exam else None
+
+
 def schedule_from_progress(path, packed_cards):
     """The app's own progress export -> {track: {cardId: {due, iv, ease, reps, last}}} for the packed cards."""
     try:
@@ -155,6 +163,9 @@ def main():
         data = json.loads((DATA / f"{k}.json").read_text("utf-8"))
         entry, card_ids, question_ids, skipped = pack_track(out, k, data)
         entry = {"key": k, "label": info[k]["label"], "subtitle": info[k].get("subtitle", ""), **{x: entry[x] for x in ("categories", "cards", "questions")}}
+        exam = exam_settings(meta.get("examConfig", {}).get(k))
+        if exam:
+            entry["exam"] = exam
         entries.append(entry)
         packed_cards[k], packed_questions[k] = card_ids, question_ids
         note = f" ({skipped} image questions left out)" if skipped else ""

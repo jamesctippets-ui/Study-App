@@ -30,8 +30,14 @@ small buffer and index items by byte offset instead of loading a file whole.
 ```json
 {"pack": "cert-study-eink", "v": 1, "built": "2026-11-11",
  "tracks": [{"key": "ccna", "label": "CCNA", "subtitle": "Cisco Certified Network Associate (200-301)",
-             "categories": ["Network Fundamentals", "Network Access"], "cards": 233, "questions": 201}]}
+             "categories": ["Network Fundamentals", "Network Access"], "cards": 233, "questions": 201,
+             "exam": {"length": 60, "minutes": 75, "passPct": 82}}]}
 ```
+
+`exam` is optional (added after v1 shipped, so readers must not require it): the track's practice test, from the
+app's `examConfig`. `length` is the number of questions, `minutes` the time limit and `passPct` the pass mark in
+percent. A reader with no `exam` for a track can fall back to its own defaults. Practice-test answers are logged as
+ordinary question lines (`k:"q"`), so the app's import needs no change.
 
 ### cards.jsonl
 
