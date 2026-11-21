@@ -1,0 +1,112 @@
+{
+ "hero": "Luis Ortega",
+ "intro": [
+  "Luis Ortega is a systems administrator at Redhill Supply, a distributor with warehouses in four towns. Over the years he has become the person people ask about security, even though nobody ever gave him that job. He decides to make it official by preparing for the SSCP.",
+  "Follow Luis through the incidents, audits and late nights that teach him the practitioner’s side of security."
+ ],
+ "beats": {
+  "security-concepts-and-controls": [
+   "A finance employee at Redhill can add suppliers and approve payments. An audit finds a supplier that does not exist, paid every month for a year. Luis learns the principles that would have stopped it: separation of duties, least privilege, and change control, and the habit of recording what ‘normal’ looks like."
+  ],
+  "access-control-and-identity": [
+   "An engineer who moved departments still holds the roles of her old team, and three service accounts have not had a new password in years. Luis learns authentication factors, single sign-on and federation, the models for deciding who gets what, and why access that is not regularly reviewed tends to creep upwards."
+  ],
+  "risk-and-vulnerability-management": [
+   "The quarterly scan lists four hundred findings. Luis removes false alarms, ranks what is left by how exposed and valuable each system is, not just by a score, and fixes the internet-facing payment portal first. He learns how to measure and treat risk, and how a penetration test is scoped and agreed."
+  ],
+  "monitoring-logging-and-siem": [
+   "Two servers’ logon times are minutes out of order, making an intrusion timeline impossible to build. The cause is a clock that was never synchronised. Luis fixes that and sees a clear pattern of failed logons. He learns how logs are collected and protected, how detections work, and why a baseline of normal is the starting point for spotting abnormal."
+  ],
+  "incident-response-forensics-recovery": [
+   "At 7:40 on a Monday a workstation starts renaming files and shows a ransom note. Luis isolates it but leaves it powered on, captures memory, and escalates. The backup team disconnects the backup repository before it can be reached. Luis learns the incident stages, how to preserve evidence in the right order, and how continuity and recovery plans are measured."
+  ],
+  "cryptography-in-practice": [
+   "Two Redhill sites must send large nightly backups and have no shared secret. Luis learns how an asymmetric exchange can set up a fast symmetric session, how hashes and signatures prove integrity and origin, how certificates tie keys to identities, and why managing keys is the hard part."
+  ],
+  "network-security-controls": [
+   "The public web server and mail relay go into a protected zone with only the necessary ports open; the internal database stays inside. Luis learns how networks are layered and attacked, how segments and firewalls limit damage, how remote and wireless access are secured, and how monitoring keeps watch."
+  ],
+  "systems-endpoint-cloud-application-security": [
+   "Redhill’s warehouse app moves to rented virtual machines. Luis finds unpatched images, a storage area readable by anyone with a link, and warehouse staff reading company email on personal phones. He learns about hardening and patching, controls for endpoints and mobiles, shared responsibility in the cloud, and the safe coding habits that stop common attacks."
+  ]
+ },
+ "epilogue": [
+  "On the day of the exam, Luis thinks back through the year: the fake supplier, the ransom note, the unsynchronised clocks. Each one taught him a chapter of this book. He opens the first question and recognises the situation."
+ ],
+ "bad": {
+  "security-concepts-and-controls": [
+   "Luis gives the new accountant ‘need-to-know’ on the payments data and thinks he has applied least privilege. But the accountant can still delete the files and reboot the server. Need-to-know limits what you can see; least privilege limits everything you can do. The accountant, who only wanted to read a spreadsheet, is baffled by his own power."
+  ],
+  "access-control-and-identity": [
+   "Luis proudly deploys ‘multi-factor authentication’ with a password and a security question. A colleague asks how many kinds of factor that is. Luis counts. ‘One,’ he says. The colleague nods. A password and a security answer are both things you know. Luis adds a hardware key and a note: ‘kinds, not counts’."
+  ],
+  "risk-and-vulnerability-management": [
+   "Luis ranks vulnerabilities purely by score. A 9.8 on a printer nobody can reach is fixed before a 7.5 on the payments portal. The CFO asks why the printer is safe and the portal is not. Technical severity is not the same as risk to the business. The printer, in its defence, was very well patched."
+  ],
+  "monitoring-logging-and-siem": [
+   "Luis tunes the alerts until the dashboard is peaceful and green. The silence is wonderful. It is also because real events are being filtered out. A missed real attack is worse than a false alarm. The dashboard is as quiet as a library, and for rather similar reasons."
+  ],
+  "incident-response-forensics-recovery": [
+   "Faced with the ransom note, a junior colleague’s first move is to switch off the workstation. The memory, where the evidence lived, is gone. Isolating from the network and capturing volatile data should have come first. The workstation sits dark, like a witness who has just fallen asleep."
+  ],
+  "cryptography-in-practice": [
+   "Luis encrypts the backup manifest with his own private key and signs it with the partner’s public key. Both are the wrong way round. The partner cannot read it, and anyone can forge the signature. Encrypt with the recipient’s public key; sign with your own private key. Luis draws a diagram and puts it on the wall."
+  ],
+  "network-security-controls": [
+   "Luis puts the database in a VLAN and says it is ‘firewalled’. A VLAN separates traffic; it does not filter it. Anyone who can route between VLANs can reach the database. Luis adds a stateful firewall rule and removes the word ‘firewalled’ from his documentation."
+  ],
+  "systems-endpoint-cloud-application-security": [
+   "Luis assumes that the cloud provider patches the operating systems on the rented virtual machines. In infrastructure-as-a-service, they do not; the customer does. The provider patches the hosts. The guest systems sit unpatched, as quiet as sleeping dogs, until somebody pokes them."
+  ]
+ },
+ "review": {
+  "security-concepts-and-controls": {
+   "problem": "Security is done by habit, with no shared principles.",
+   "cause": "Principles such as least privilege and separation of duties are not applied consistently.",
+   "solution": "Core objectives, control types and everyday habits like change control and baselines make security repeatable.",
+   "next": "Next, access control and identity."
+  },
+  "access-control-and-identity": {
+   "problem": "Access creeps and proof of identity is weak.",
+   "cause": "Accounts and rights are never reviewed and factors are miscounted.",
+   "solution": "Authentication factors, SSO, federation, access models and the identity lifecycle control who gets in.",
+   "next": "Next, risk and vulnerability management."
+  },
+  "risk-and-vulnerability-management": {
+   "problem": "There are too many weaknesses and not enough time.",
+   "cause": "Findings are ranked by score alone, without business context.",
+   "solution": "Risk measurement, scanning, testing and prioritisation by exposure and value put effort where it matters.",
+   "next": "Next, monitoring and detection."
+  },
+  "monitoring-logging-and-siem": {
+   "problem": "Attacks happen and nobody notices.",
+   "cause": "Logs are scattered, clocks differ and alerts are tuned too far.",
+   "solution": "Log collection, integrity, SIEM, detection methods and baselines make attacks visible.",
+   "next": "Next, incident response and recovery."
+  },
+  "incident-response-forensics-recovery": {
+   "problem": "An incident hits, and response destroys evidence or recovery takes too long.",
+   "cause": "There is no plan for containment, evidence order or restoration targets.",
+   "solution": "The incident lifecycle, forensic order of volatility, and continuity and backup planning handle the incident properly.",
+   "next": "Next, cryptography."
+  },
+  "cryptography-in-practice": {
+   "problem": "Data must be protected and verified in transit and storage.",
+   "cause": "Keys and algorithms are used the wrong way round or poorly managed.",
+   "solution": "Symmetric and asymmetric encryption, hashing, signatures, certificates and key management protect and prove.",
+   "next": "Next, network security."
+  },
+  "network-security-controls": {
+   "problem": "Networks are attacked from inside and out.",
+   "cause": "Segments are not filtered and remote access is weak.",
+   "solution": "Segmentation, firewalls, VPNs, wireless and monitoring contain and detect.",
+   "next": "Next, systems, endpoints, cloud and applications."
+  },
+  "systems-endpoint-cloud-application-security": {
+   "problem": "Systems and applications are weakest where nobody looks.",
+   "cause": "Patching, mobile devices, cloud configuration and code are all unmanaged.",
+   "solution": "Hardening, endpoint controls, shared responsibility and secure coding close the gaps.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

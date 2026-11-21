@@ -1,0 +1,76 @@
+{
+ "hero": "Elena Vasquez",
+ "intro": [
+  "Elena Vasquez is a tier-2 analyst in the security operations centre of Corvane Bank. Alerts come in by the hundreds. Her lead, Marcus, has told her that this year, she will help tune the detections, lead incidents and start hunting threats on her own. She starts studying for SC-200 to make it all connect.",
+  "Follow Elena through a handful of long shifts, one incident at a time."
+ ],
+ "beats": {
+  "sentinel-analytics-automation": [
+   "Elena installs a solution for a new firewall vendor and expects incidents to appear. Nothing does, even though data is flowing in. The reason: the rule templates were installed but never turned on. She learns which kinds of rules exist, what separates a rule that creates incidents from an automation that acts on them, and how to tune detections so alert fatigue does not win."
+  ],
+  "xdr-copilot-threat-intel": [
+   "Marcus asks Elena to review the coverage map against known attacker techniques. One technique looks covered, but only by a rule disabled months ago during a noisy week. That is not the same as having no rule. Elena learns how the portal correlates alerts into incidents, how AI assistants speed up investigation, and how watchlists and behaviour analytics add context."
+  ],
+  "endpoint-identity-response": [
+   "A laptop is compromised, but its user is on a customer call. Elena applies a selective isolation that cuts off most traffic but keeps Teams and mail working, then opens a live session to remove the malicious script. She also learns how to block a known-bad file everywhere, and how identity alerts show an attacker moving from machine to machine."
+  ],
+  "email-cloudapps-incident-mgmt": [
+   "A suspected business email compromise: a hidden inbox rule forwards anything mentioning “invoice” to an outside address, and the same account signed in from an unusual place. Elena learns how to investigate email and app risk, how to enforce controls in-session, and how to carry a Sentinel incident from triage through to a clean closure."
+  ],
+  "kql-threat-hunting": [
+   "With a quiet Friday, Elena finally hunts. She learns to write queries that pipe data step by step, join tables across products, save lists of suspicious processes as reusable functions, and turn a good hunt into a standing detection. The first time her query finds something no rule had caught, Marcus nods and says nothing, which from him is high praise."
+  ]
+ },
+ "epilogue": [
+  "On exam day Elena remembers the shift where nothing was on fire and she was still finding things. The exam scenarios feel familiar: an alert, a decision, a next step. She reads each one as a case in her queue."
+ ],
+ "bad": {
+  "sentinel-analytics-automation": [
+   "Elena installs a content hub solution and waits for incidents. The dashboard stays empty, and Elena concludes that the bank is, remarkably, unattackable. It is not. The rule templates were installed but never switched on. Marcus raises an eyebrow so slowly that it could have been a weather system."
+  ],
+  "xdr-copilot-threat-intel": [
+   "An analyst accepts an AI assistant’s summary of an incident and sends it to the CISO without checking it. The summary confidently names a server that does not exist. The CISO, a polite man, replies: ‘Can you show me where it is?’ The assistant was grounded in data, but not verified. Elena adds a line to the playbook: review before action."
+  ],
+  "endpoint-identity-response": [
+   "Elena isolates a compromised laptop completely. The customer call it was on drops mid-sentence, and the customer’s account manager phones to ask whether the bank has been hacked. It has, in a small way, but not as much as it now seems. Selective isolation would have kept the call alive and the panic small."
+  ],
+  "email-cloudapps-incident-mgmt": [
+   "An analyst closes the same false-positive incident by hand every morning for a month, with the quiet pride of a man who is doing his job. It returns every morning. Nobody tuned the detection. Elena takes pity, excludes the harmless entity and the incident vanishes, to the bewilderment of the analyst, who had begun to think of it as a colleague."
+  ],
+  "kql-threat-hunting": [
+   "Elena writes a hunt for accounts with no sign-ins in ninety days and uses an inner join. The result is an empty table. A very satisfied empty table. The inner join dropped every account with no match, which is exactly the ones she wanted. An anti-join gives the answer. The empty table was, in its way, a very confident liar."
+  ]
+ },
+ "review": {
+  "sentinel-analytics-automation": {
+   "problem": "Alerts arrive in overwhelming volume or not at all.",
+   "cause": "Content is installed but not enabled, and automation is not matched to its triggers.",
+   "solution": "Analytic rule types, data connectors, automation rules, playbooks and tuning tools produce accurate, actionable detections.",
+   "next": "Next, wider visibility across the portal, AI and threat intelligence."
+  },
+  "xdr-copilot-threat-intel": {
+   "problem": "Analysts cannot see the whole picture or trust what summaries tell them.",
+   "cause": "Signals are spread across products, and coverage gaps are hidden.",
+   "solution": "Unified incidents, automated investigation, Security Copilot with review, watchlists, behaviour analytics and threat intelligence add visibility and context.",
+   "next": "Next, responding to compromised devices and identities."
+  },
+  "endpoint-identity-response": {
+   "problem": "A compromised device or account needs fast, proportionate containment.",
+   "cause": "Full isolation disrupts business, and identity attacks hide behind normal activity.",
+   "solution": "Isolation options, live response, indicators, attack disruption and identity detections contain and investigate.",
+   "next": "Next, email and cloud app incidents, and running incidents to closure."
+  },
+  "email-cloudapps-incident-mgmt": {
+   "problem": "Phishing and risky cloud apps lead to compromise, and incidents drag on.",
+   "cause": "Controls decide at the start of a session, and false positives are closed by hand.",
+   "solution": "Email investigation, session policies, anomaly detections and a disciplined incident process handle each step.",
+   "next": "Next, proactive hunting with KQL."
+  },
+  "kql-threat-hunting": {
+   "problem": "Some attacks never trigger a rule.",
+   "cause": "Detections catch what is known, not what is subtle or new.",
+   "solution": "KQL pipelines, joins, reusable functions and hunting promote discoveries into standing detections.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

@@ -1,0 +1,88 @@
+{
+ "hero": "Ingrid Solheim",
+ "intro": [
+  "Ingrid Solheim is the lead cloud architect at Fjord & Co, a retailer with shops in six countries and an on-premises directory that has never been retired. The board wants a single, well-governed Azure platform for the next five years. Ingrid does not want to make a design she will regret, so she is studying for AZ-305 and drawing as she goes.",
+  "Follow Ingrid’s design decisions from sign-in to migration."
+ ],
+ "beats": {
+  "identity-access-management": [
+   "Fjord & Co has an on-premises directory it is not ready to retire, and it wants cloud sign-in to keep working even if the head office network drops. Ingrid compares ways of verifying passwords, and picks the one that does not depend on the on-premises network being up. She also designs how privileged access is granted just in time, and how access is reviewed so it does not pile up."
+  ],
+  "governance-monitoring-landing-zones": [
+   "Ingrid designs the structure that every new Fjord & Co subscription will land in: a hierarchy of management groups with company-wide rules at the top, and an approved starting environment for each team. She plans one central place for logs and metrics, so that monitoring is a design decision and not an afterthought."
+  ],
+  "data-storage-solutions": [
+   "A regional analytics team needs to move a SQL Server database that relies on agent jobs, and to reach a data lake privately from the shops. Ingrid assesses compatibility first, then picks the managed hosting model that fits. For a global loyalty-card service she chooses a database, a consistency level and a partition key, balancing speed against exactness. For storage, she chooses the right copy strategy for each kind of data."
+  ],
+  "business-continuity": [
+   "The payments team sets targets: recovery in under two minutes and almost no data lost. Ingrid designs from those numbers, not from preference. For payments she picks a design across two regions that is always running, for internal tools a cheaper design that is started after a failure, and for backups, the right service for the job. The lesson: let the recovery targets choose the architecture."
+  ],
+  "compute-networking-architecture": [
+   "The retail platform needs a hub-and-spoke network, with a central firewall filtering outbound traffic by name, a private line to head office, and a front door that spreads customers across regions. Ingrid works through which compute service suits which workload, from simple web apps to containers to event-driven functions."
+  ],
+  "migration-integration-operations": [
+   "Fjord & Co has a fleet of old servers and a growing set of new cloud-native services that need to talk to them. Ingrid begins with discovery and assessment, picks migration tools for servers and databases, and chooses between several messaging services by asking what each message means. An API gateway, workflow tools and network diagnostics round out the platform."
+  ]
+ },
+ "epilogue": [
+  "The Fjord & Co platform is live. On the morning of AZ-305, Ingrid notices that almost every exam question is really the same question she has been asking all year: given these requirements, which trade-off is acceptable? She reads each one slowly, finds the requirement hiding in the text, and lets it choose the answer."
+ ],
+ "bad": {
+  "identity-access-management": [
+   "Ingrid, in a design review, picks pass-through authentication ‘because it never stores passwords’. Someone asks what happens when the head office network goes down. A pause. Pass-through needs the on-premises network to be up for each sign-in, and the retailer’s explicit requirement was surviving exactly that outage. The slide is quietly deleted."
+  ],
+  "governance-monitoring-landing-zones": [
+   "A well-meaning team designs a policy that audits whether resources are in the right region and congratulates itself. Months later, forty resources are still in the wrong region. Audit reports; it does not fix. Ingrid draws a line on the whiteboard between ‘tells you’ and ‘does something about it’."
+  ],
+  "data-storage-solutions": [
+   "The loyalty-card team picks the customer’s country as the partition key. One country has 70 percent of the customers, so one partition does 70 percent of the work while the others sit in the shade. Adding more throughput to the whole database costs a fortune and fixes nothing. The key was the problem."
+  ],
+  "business-continuity": [
+   "Someone proposes a cheap standby region, ‘warm but not running’, for the payments system, and says failover will take a few minutes. The requirement is two minutes with almost no data lost. Ingrid asks what a few minutes costs in lost payments. The room does arithmetic. The standby is promoted to active."
+  ],
+  "compute-networking-architecture": [
+   "A team peers spoke A to the hub and spoke B to the hub and assumes A and B can reach each other. They cannot, because peering does not pass through. A very patient network engineer reads out the phrase ‘not transitive’ three times and then draws a firewall in the middle."
+  ],
+  "migration-integration-operations": [
+   "Someone orders a fleet of migrations without first running discovery. Halfway through, they find a server nobody knew existed, running something nobody understands, connected to something important. It is known as ‘the box’. Nobody dares switch it off. Discovery would have found it on day one."
+  ]
+ },
+ "review": {
+  "identity-access-management": {
+   "problem": "Sign-in must be secure and survive outages across on-premises and cloud.",
+   "cause": "Different sign-in methods depend on different parts of the network, and access to privileged roles tends to become permanent.",
+   "solution": "Hash sync, pass-through and federation are compared, and Conditional Access, PIM and reviews control and limit access.",
+   "next": "Next, governing and monitoring Azure at scale."
+  },
+  "governance-monitoring-landing-zones": {
+   "problem": "Many teams and subscriptions with no consistent rules or visibility.",
+   "cause": "Each team builds its own environment, and monitoring is added later.",
+   "solution": "Management groups, policy, landing zones and one central monitoring design provide structure and visibility.",
+   "next": "Next, designing where data lives."
+  },
+  "data-storage-solutions": {
+   "problem": "Data must be stored in the right place with the right performance, durability and cost.",
+   "cause": "The options differ widely, and a poor choice of model, key or tier is hard to change later.",
+   "solution": "SQL hosting, Cosmos DB design, storage redundancy and tiers, and secure transfer are matched to the requirements.",
+   "next": "Next, keeping the business running through failure."
+  },
+  "business-continuity": {
+   "problem": "An outage stops the business, and recovery takes too long or loses too much.",
+   "cause": "Recovery targets were never set, or the design does not match them.",
+   "solution": "RTO and RPO drive the design, with backup, site recovery, zones, regions and active designs each placed where they fit.",
+   "next": "Next, compute and networking architecture."
+  },
+  "compute-networking-architecture": {
+   "problem": "Applications need the right place to run and secure, efficient paths to each other.",
+   "cause": "Compute services and network topologies are chosen by habit, and connections do not behave as assumed.",
+   "solution": "Compute selection, hub-and-spoke, firewalls, peering, VPN, ExpressRoute and traffic distribution fit the need.",
+   "next": "Next, moving existing workloads and connecting systems."
+  },
+  "migration-integration-operations": {
+   "problem": "Existing systems must be moved and connected without surprises.",
+   "cause": "Estates are not fully known, and messaging and integration needs differ.",
+   "solution": "Discovery and assessment, migration tools, the right messaging service, API management and network diagnostics address each stage.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

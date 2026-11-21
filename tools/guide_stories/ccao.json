@@ -1,0 +1,136 @@
+{
+ "hero": "Rosa Martinelli",
+ "intro": [
+  "Rosa Martinelli is an operations coordinator at Alder & Finch, a mid-sized services firm. Her team has been given access to Claude, and her manager has asked her to be the person who shows everyone else how to use it well. Rosa has used it a bit, with mixed results. She starts the CCAO-F to learn what ‘well’ actually means.",
+  "Follow Rosa as she goes from fiddling with prompts to running a team that uses Claude responsibly."
+ ],
+ "beats": {
+  "prompting-clear-requests": [
+   "Rosa’s first job is an announcement about a new expense policy for 400 field staff. Her first prompt, one short sentence, produces a stiff, generic memo. She tries again with the readers, the purpose, the tone, the length, the format and a sample of the house style, and the result is usable. The difference is not magic, just a clear brief."
+  ],
+  "prompting-decompose-iterate": [
+   "Rosa has 200 free-text survey comments and a board meeting on Friday. She does not ask for a report; she asks Claude to group the comments into themes with example quotes, reads the result, merges two themes, and moves on to the next step. Big jobs go better in stages that she can check."
+  ],
+  "evaluation-hallucinations-validation": [
+   "For a board slide, Rosa asks for three statistics with sources. Claude gives confident numbers. She asks for the passage behind each figure and tries to find each one in the real report. One of them is not there. Rosa learns what Claude is and is not good at, and how to check what matters before it reaches anyone else."
+  ],
+  "evaluation-bias-review-formats": [
+   "Rosa asks for screening criteria for a customer-service hiring round and the draft includes phrases like ‘digital native’ and ‘high energy’. She asks for criteria based on the job, tests by swapping details to see whether the output changes, and decides where a person must review before anything is used. She also learns when a reply, a document or a file is the right shape of answer."
+  ],
+  "models-features-models-context": [
+   "Alder & Finch uses Claude for three jobs: tagging hundreds of expense lines each night, drafting a weekly update, and thinking through hard questions. Rosa learns that the small, fast model suits the first, a stronger one with more effort suits the third, and that long conversations need a fresh start with a summary rather than an ever-growing history."
+  ],
+  "workflow-design-integrate-communicate": [
+   "An analyst spends two days each month turning store managers’ emails into a summary for executives. Rosa helps her try Claude on a sample, measure how long it takes now, keep a person approving the final version, and explain the new process to colleagues honestly, including what it cannot do."
+  ],
+  "knowledge-projects-instructions-connectors": [
+   "A training manager sets up a shared Project for answering client questions: current guides and prices as knowledge, instructions that say how to answer and what to do when the answer is not in the files. Rosa learns how instructions, files and connected tools fit together, and why a configuration needs testing and keeping up to date."
+  ],
+  "governance-data-privacy-regulated": [
+   "A coordinator asks which departments log the most overtime. The payroll export has names, home addresses and ID numbers. Rosa checks the AI policy, and the answer is: send only what is needed, with names and identifiers removed, through the approved tool. She learns how data is classified, what must never be pasted in, and what to do if something is sent by mistake."
+  ],
+  "governance-use-cases-policy-ethics": [
+   "A hiring manager wants Claude to rank 400 applications and send automatic rejections to the bottom half. The HR lead explains that employment is a high-risk area, and instead uses Claude to summarise each application against the posting, with a person making every decision. Rosa learns where the line sits between help and decision, and how to be open about AI use."
+  ],
+  "troubleshooting-diagnose-iterate-optimize": [
+   "The support team’s saved prompt writes replies that sound cold to upset customers, and the layout varies. Rosa collects ten real examples, works out whether the problem is missing context, conflicting instructions or no sample, changes one thing at a time and measures. She learns when to switch approach and when a person should take over."
+  ]
+ },
+ "epilogue": [
+  "A month later, Rosa’s team has a short guide, a few trusted projects and a habit of checking before they send. On exam day she imagines each scenario as a colleague’s question at her desk, and answers it the way she has been answering them for months."
+ ],
+ "bad": {
+  "prompting-clear-requests": [
+   "Rosa types ‘Make it better’ into the chat and gets back something that is, technically, different. She types it again. And again. By the fifth round she has a document that has been made better in five directions at once, like a horse pulled by five cars. ‘Better’ was never a brief. A brief says who it is for, what it is for and what shape it should take."
+  ],
+  "prompting-decompose-iterate": [
+   "Rosa pastes a three-page prompt of rules, each in capitals, and asks Claude to do all five tasks at once. The result obeys every rule loudly and completes none of the tasks well. Cutting the prompt in half and doing the tasks one at a time works better. Shouting, it turns out, is not a management technique."
+  ],
+  "evaluation-hallucinations-validation": [
+   "A colleague asks Claude whether its own statistics are correct. Claude says yes, politely. The statistics are still invented. Asking a source to confirm itself is not checking; it is asking the witness whether the witness is lying. The report is checked against the real documents, and the colleague learns what a primary source looks like."
+  ],
+  "evaluation-bias-review-formats": [
+   "A manager asks Claude whether the interview scoring rubric is biased. Claude says no, graciously. The manager takes this as proof. A better test is to swap names and details and see whether the scores change. They do. Asking the system to mark its own homework is lovely but not evidence."
+  ],
+  "models-features-models-context": [
+   "Rosa uses the largest model at the highest effort to tag 800 expense lines overnight. It does the job beautifully, and slowly, and expensively. A small, fast model would have been fine, with a sample checked. The jobs are not all the same size, and neither should the tools be."
+  ],
+  "workflow-design-integrate-communicate": [
+   "Rosa’s team finds that Claude’s summary of the store emails is excellent in the first week and removes the human review in the second. In the third week, one summary quietly misses a safety complaint. Controls should relax in stages and never where mistakes are costly. The complaint is found, late, by a person."
+  ],
+  "knowledge-projects-instructions-connectors": [
+   "The training manager writes the rules for the Project into its description field. Claude cannot see the description, so none of the rules are used. The answers are plausible and entirely rule-free. The rules belong in the instructions. Everyone thought the description was where you put them. It is where you put a description."
+  ],
+  "governance-data-privacy-regulated": [
+   "A colleague pastes the full payroll export, names and all, into the chat, since ‘the vendor doesn’t train on our data’. The vendor’s promise is nice; the company’s policy still decides what may be shared. The colleague receives a polite email with the word ‘incident’ in the subject line."
+  ],
+  "governance-use-cases-policy-ethics": [
+   "The hiring manager says that a person clicks ‘approve’ on each AI recommendation, so there is human review. The person has eleven seconds per application, no information beyond the summary and no authority to change anything. This is not review; it is a person standing near a decision. The HR lead redesigns it."
+  ],
+  "troubleshooting-diagnose-iterate-optimize": [
+   "The team rewrites the prompt six times to get Claude to quote the right refund policy. It never does, because the policy was never in the conversation. No wording can supply a fact that is missing. Rosa pastes the policy in. The next reply is perfect, and the six rewrites are quietly retired."
+  ]
+ },
+ "review": {
+  "prompting-clear-requests": {
+   "problem": "Claude’s answers are generic.",
+   "cause": "Requests lack audience, purpose, format and examples.",
+   "solution": "A clear brief, background, format, constraints, positive instructions and varied examples give specific results.",
+   "next": "Next, breaking down bigger tasks and iterating."
+  },
+  "prompting-decompose-iterate": {
+   "problem": "Big jobs produce muddled results.",
+   "cause": "Everything is asked at once, with vague feedback.",
+   "solution": "Decomposition, chaining, success criteria and targeted feedback make big jobs manageable.",
+   "next": "Next, spotting errors and validating."
+  },
+  "evaluation-hallucinations-validation": {
+   "problem": "Claude sounds right when it is wrong.",
+   "cause": "Fluent text is mistaken for verified fact.",
+   "solution": "Knowing how errors arise and checking against primary sources, with prompts that make errors easier to spot, protect you.",
+   "next": "Next, bias, review and format."
+  },
+  "evaluation-bias-review-formats": {
+   "problem": "Outputs can be biased, flattering or wrongly formatted.",
+   "cause": "Self-assessment is trusted, and review is skipped on important output.",
+   "solution": "Swap tests, human review, audience editing and the right output format reduce the risk.",
+   "next": "Next, choosing models and managing context."
+  },
+  "models-features-models-context": {
+   "problem": "Time and money are wasted on the wrong model or feature.",
+   "cause": "Every task is given the same tool, and long chats degrade.",
+   "solution": "Matching feature, model tier and effort to the task, and managing context and handoffs, fixes it.",
+   "next": "Next, designing workflows."
+  },
+  "workflow-design-integrate-communicate": {
+   "problem": "Claude is used without a clear place in the work.",
+   "cause": "Needs, bottlenecks and risks are assumed.",
+   "solution": "Requirements analysis, prototypes, human review and honest communication build workable workflows.",
+   "next": "Next, projects, instructions and connected knowledge."
+  },
+  "knowledge-projects-instructions-connectors": {
+   "problem": "Claude does not know your standards or documents.",
+   "cause": "Rules are in the wrong place and knowledge is out of date.",
+   "solution": "Project instructions, knowledge, connectors and testing give consistent, grounded answers.",
+   "next": "Next, protecting sensitive data."
+  },
+  "governance-data-privacy-regulated": {
+   "problem": "Sensitive data ends up where it should not.",
+   "cause": "Classification and policy are not checked first.",
+   "solution": "Classification, minimisation, redaction, approved tools and agreements keep data safe.",
+   "next": "Next, appropriate use and ethics."
+  },
+  "governance-use-cases-policy-ethics": {
+   "problem": "Claude is used for decisions it should not make.",
+   "cause": "High-risk uses and rubber-stamp reviews.",
+   "solution": "Judging appropriateness, human oversight, disclosure and policy keep use responsible.",
+   "next": "Next, fixing weak outputs."
+  },
+  "troubleshooting-diagnose-iterate-optimize": {
+   "problem": "Outputs remain weak despite repeated tries.",
+   "cause": "The real cause is not diagnosed.",
+   "solution": "Diagnosing the cause, changing one thing at a time and measuring improve outputs.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

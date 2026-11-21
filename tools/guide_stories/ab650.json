@@ -1,0 +1,76 @@
+{
+ "hero": "Aisha Rahman",
+ "intro": [
+  "Aisha Rahman is the new Microsoft 365 administrator at Calloway & Pike, a regional engineering firm with six hundred staff. On her first Monday the CIO tells her two things: the company wants to roll out Copilot this quarter, and a security review is coming. Aisha is studying for AB-650 so she can do both without breaking anything.",
+  "Follow Aisha from setting up the tenant to making sure the company’s AI tools only see what they should."
+ ],
+ "beats": {
+  "tenant-configuration-management": [
+   "Calloway & Pike has just merged with a smaller firm, and Aisha inherits two tenants’ worth of mess. She verifies the new company domain, sets up group-based licensing so new hires get the right apps automatically, and works out which mailboxes should be shared and which groups should be Microsoft 365 groups. Her last task of the week: give an outside partner limited, time-bound admin rights instead of a full account."
+  ],
+  "identity-access-threat-protection": [
+   "A routine sign-in report shows a user signing in from two countries within an hour. Aisha has already set up Conditional Access to demand multi-factor authentication, but now she wants it to react to risky sign-ins automatically. She also puts her own admin role behind just-in-time activation, so no one, including her, has standing power. Then she checks how the mail filter handles suspicious attachments."
+  ],
+  "data-governance-compliance": [
+   "Legal asks Aisha for a rule: engineering drawings must be labelled confidential when created, kept for seven years, then deleted. She learns which tool handles labels, which handles keeping and deleting, and which stops sensitive data from leaving the company. Before turning on a new blocking rule she tests it in audit mode to see what it would catch. She is learning that governance is mostly about stages and testing."
+  ],
+  "copilot-licensing-and-grounding": [
+   "The pilot group of finance users gets Copilot licences through a group. In week one, one of them asks Copilot to summarise some files and it surfaces a budget spreadsheet that was shared far too widely years ago. Copilot did not break any rules; it only showed what the user could already open. Aisha realises Copilot makes oversharing visible, and that her real job is to fix the permissions underneath."
+  ],
+  "securing-and-governing-ai-agents": [
+   "Before the full rollout, Aisha runs a security assessment of how AI is being used. It finds Copilot answers quoting account numbers from an old shared spreadsheet. She labels it, adds a policy so Copilot cannot repeat labelled content, and gives each new AI agent its own identity so she can control and audit it. She also turns on logging of AI interactions. The CIO asks if the company is ready; Aisha finally has an answer."
+  ]
+ },
+ "epilogue": [
+  "The week before the exam, Aisha realises she has not just been studying, she has been doing the job: tenant, identity, data, Copilot, agents. The CIO is happy, the review passed, and the rollout is on schedule. She walks into the exam room, calm, because she has already seen all of it work."
+ ],
+ "bad": {
+  "tenant-configuration-management": [
+   "Aisha is asked to email a department with a distribution group. She cheerfully tells a new colleague to ‘check the group’s inbox’ for replies. There is no inbox. Distribution groups do not keep mail, they just shout it at people and move on. The colleague spends an afternoon searching for a mailbox that has never existed."
+  ],
+  "identity-access-threat-protection": [
+   "Aisha turns on Conditional Access without switching off the security defaults, expecting the two to ‘work together’. They do not. She gets an error message and a lesson in picking one lane. Elsewhere, a colleague approves a risky sign-in because ‘they did the MFA’, ignoring the leaked password that nobody changed."
+  ],
+  "data-governance-compliance": [
+   "Legal asks for a seven-year retention rule. Aisha applies one policy to the entire document library and then discovers that some files must be kept for ten years. She tries to fix it with a second policy, and now the two disagree. The longer period wins, which is lucky, because the alternative was deleting evidence."
+  ],
+  "copilot-licensing-and-grounding": [
+   "The CFO says, with great confidence, ‘We have E3, so we have Copilot.’ He does not. The add-on must be assigned. After the pilot, a different executive assumes that Copilot can ‘see’ files he has never been given, and is disappointed when it declines to find the board minutes. It was following the rules rather better than the company had."
+  ],
+  "securing-and-governing-ai-agents": [
+   "A manager creates a handy AI agent for the team and gives it his own account to ‘keep things simple’. The agent now does everything he can do, including things he forgot he could. A policy that merely reports on oversharing does not stop anything either; it just writes a very nice report about the problem."
+  ]
+ },
+ "review": {
+  "tenant-configuration-management": {
+   "problem": "The new tenant has two companies’ worth of users, licences and groups, and none of it is consistent.",
+   "cause": "Domains, licensing, mail objects and admin rights were set up independently, and each has its own rules.",
+   "solution": "The chapter shows domain verification, group-based licensing, the right mail and collaboration objects, and delegated admin with limits.",
+   "next": "Next, protecting who can sign in and what they can reach."
+  },
+  "identity-access-threat-protection": {
+   "problem": "Accounts get attacked, and one stolen password can reach a great deal.",
+   "cause": "Passwords alone are weak, and static rules cannot react to risk as it happens.",
+   "solution": "Conditional Access, MFA, risk-based policies, privileged identity management and threat protection verify, limit and react.",
+   "next": "Next, protecting the data itself."
+  },
+  "data-governance-compliance": {
+   "problem": "Sensitive data is kept too long, deleted too early, or leaked.",
+   "cause": "Content is created everywhere with no consistent labelling, keeping or blocking rules.",
+   "solution": "Sensitivity labels, retention, DLP, eDiscovery and audit each handle a different part of the data’s life.",
+   "next": "Next, what happens when Copilot reads all of it."
+  },
+  "copilot-licensing-and-grounding": {
+   "problem": "Copilot makes it easy to find everything a user can open, including things they should never have been able to.",
+   "cause": "Years of loose permissions were harmless while nobody looked, but search that actually reads everything exposes them.",
+   "solution": "The chapter covers licensing, how Copilot is grounded without granting new access, and how to fix the real cause, oversharing.",
+   "next": "Next, governing the AI agents that act on a user’s behalf."
+  },
+  "securing-and-governing-ai-agents": {
+   "problem": "AI agents can act, quote and spend, and nothing is watching them.",
+   "cause": "They run with borrowed identities and unlabelled data, and no policy applies to them.",
+   "solution": "The chapter adds posture reporting, enforcement through DLP, separate agent identities, and audit of AI activity.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

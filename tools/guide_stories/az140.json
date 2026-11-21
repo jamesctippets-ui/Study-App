@@ -1,0 +1,76 @@
+{
+ "hero": "Chloe Tan",
+ "intro": [
+  "Chloe Tan works for the IT team at St. Anselm Hospital. Nurses, radiologists and administrators all want a Windows desktop that follows them from room to room, and the hospital has decided to deliver it with Azure Virtual Desktop. Chloe has been told she will run it. She has four months to learn what that means.",
+  "Follow Chloe’s rollout, from the first host pool to the first heavy Monday."
+ ],
+ "beats": {
+  "host-pools-and-images": [
+   "The first decision: who gets what? A call centre of two hundred agents can share a pool of virtual machines, since their work is identical and nothing needs to be kept on the machine. A handful of developers need their own persistent desktops with their own tools. Chloe learns how to group users, apps and desktops, how people are assigned to machines, and how to keep the base image up to date."
+  ],
+  "networking-storage-capacity-planning": [
+   "Three thousand users will log in at 8 a.m., all needing their profile loaded quickly. Chloe learns where profiles are stored, how to pick a storage option for speed and cost, and how the network path between a user and their desktop affects the experience. She also works out how many sessions fit on each machine so the hospital does not overspend."
+  ],
+  "identity-and-security-for-avd": [
+   "The compliance team has requirements: some session hosts will not be joined to the hospital’s domain, access must be conditional, and screens must not be captured. Chloe learns the different ways to join machines, which roles let people connect or manage, and how to limit what users can do inside a session. Least privilege turns out to be the main idea."
+  ],
+  "user-environments-profiles-and-apps": [
+   "A nursing-station pool is shared by many clinicians. Radiology needs a licensed imaging application that no-one else should see. Everyone needs their mail and files to follow them, but not the entire profile. Teams calls must not stutter. Chloe learns how profiles are stored, how apps are delivered separately from images, and how to hide an app from users who should not see it."
+  ],
+  "monitoring-maintenance-and-scaling": [
+   "On the first heavy Monday, a handful of sign-ins fail. Chloe uses the connection logs to follow one failing session from start to finish and finds the stall. She also sets machines to switch on as demand grows and off at night, drains a machine before patching it, and plans updates so no clinician loses a session."
+  ]
+ },
+ "epilogue": [
+  "Chloe’s rollout is a success: nurses log in at one station and pick up where they left off at another. On exam day she imagines each question as a request from the hospital, and the answer as the choice she would actually make."
+ ],
+ "bad": {
+  "host-pools-and-images": [
+   "Chloe gives the call-centre agents personal desktops ‘so they feel looked after’. Two hundred persistent machines run all night to serve people who go home at six. The monthly bill arrives. A pooled host pool would have done the same job for a fraction. Chloe puts the bill in a drawer and the cost in a spreadsheet."
+  ],
+  "networking-storage-capacity-planning": [
+   "Chloe sets the maximum sessions per host to ‘as many as will fit’. At 8 a.m. every host is full and sluggish, though the pool dashboard shows plenty of capacity. A limit that is too high spreads the pain around; one that is too low wastes money. She picks a number, tests it, and writes down why."
+  ],
+  "identity-and-security-for-avd": [
+   "Chloe protects the Azure Virtual Desktop app with a sign-in policy and considers it finished. The sign-in to the session host itself goes unprotected, so someone walks in through the side door. The auditor suggests that a house with a locked front door and an open back one is, strictly speaking, a house with a back door."
+  ],
+  "user-environments-profiles-and-apps": [
+   "Chloe tries to add a language pack for a new team after the machines are already live. It does not work that way; language packs belong in the image. The team has to wait for a new image, and the new image has to be tested, and the team have to wait. A lot of waiting for something that was one checkbox earlier."
+  ],
+  "monitoring-maintenance-and-scaling": [
+   "Chloe turns on drain mode on a host to patch it and starts the update immediately, expecting everyone to be out. Drain mode blocks new sessions but does not remove people already connected. A radiologist, mid-scan, watches her desktop restart. Chloe makes a very sincere apology and a very large pot of tea."
+  ]
+ },
+ "review": {
+  "host-pools-and-images": {
+   "problem": "Different people need different kinds of desktops, and costs and effort differ with each.",
+   "cause": "One style of desktop is used for everyone, and images are managed by hand.",
+   "solution": "Pooled and personal host pools, assignment and load balancing, application groups and image management match desktop to user.",
+   "next": "Next, networking, storage and sizing."
+  },
+  "networking-storage-capacity-planning": {
+   "problem": "Logging in is slow and capacity is wrong, too tight or too costly.",
+   "cause": "Profiles, networks and session limits were not planned for peak.",
+   "solution": "Profile storage choices, connection paths, bandwidth and VM size are planned from real numbers.",
+   "next": "Next, identity and security."
+  },
+  "identity-and-security-for-avd": {
+   "problem": "Who can sign in, what they can do and what leaves the session is not controlled.",
+   "cause": "Policies cover the service but not the hosts, and roles are broad.",
+   "solution": "Join types, Conditional Access, specific roles and session protection limit access and leakage.",
+   "next": "Next, profiles and applications."
+  },
+  "user-environments-profiles-and-apps": {
+   "problem": "Users lose settings and apps on shared machines.",
+   "cause": "Profiles and apps are tied to the image or stored in ways that do not follow the user.",
+   "solution": "Profile and Office containers, app attach and app masking deliver the right apps and settings to the right people.",
+   "next": "Next, monitoring and scaling."
+  },
+  "monitoring-maintenance-and-scaling": {
+   "problem": "Failures go unseen and capacity does not match demand.",
+   "cause": "No data flows to monitoring, scaling is manual and maintenance disrupts users.",
+   "solution": "Diagnostics, Log Analytics, scaling plans and drain mode keep the service visible, right-sized and patched.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

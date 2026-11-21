@@ -1,0 +1,100 @@
+{
+ "hero": "Amara Nwosu",
+ "intro": [
+  "Amara Nwosu manages the front office at Brookside Family Clinic. When the clinic’s email is hit by a phishing attack, she is the one who has to explain what happened to the doctors. It goes badly, and she decides to learn the subject properly. She starts studying for ISC2 Certified in Cybersecurity.",
+  "Follow Amara from a nervous front-desk manager to someone the clinic turns to when something looks wrong."
+ ],
+ "beats": {
+  "cia-risk-controls-ethics": [
+   "An assessment finds that the clinic’s patient records server is missing updates, and its room is unlocked. Amara learns the three goals of security, the difference between a threat, a weakness and an asset, and how a risk can be reduced, moved, accepted or avoided. The clinic adds a lock, a camera and training. She also learns the professional code she is expected to follow."
+  ],
+  "governance-policies-compliance": [
+   "Brookside begins serving patients across a border and taking card payments. The owner asks Amara which rules apply. She learns the difference between a policy, a standard, a procedure and a guideline, which laws and frameworks matter to which kind of business, and what it means to take reasonable care."
+  ],
+  "identity-access-management": [
+   "When a receptionist moves to billing, an access review finds she can still approve payments from her old role. Amara learns how identity is established, checked and granted, why people should have only what they need, why one person should not control a whole process, and how access should be tidied when people join, move and leave."
+  ],
+  "networking-fundamentals": [
+   "Printers, laptops and phones at the clinic all use addresses starting with 192.168. The website is slow, and the firewall logs show many requests to an old remote-access port from the internet. Amara learns how addresses and ports work, what firewalls and detection devices can and cannot do, and why old protocols deserve suspicion."
+  ],
+  "cloud-segmentation-zero-trust": [
+   "The clinic’s scheduling system is hosted in the cloud, and a backup storage area was accidentally made public. A researcher found it first. Amara learns how cloud models divide responsibility, why networks are split into zones, and why “never trust, always verify” is a good principle for places where a mistake can be this easy to make."
+  ],
+  "operations-malware-incident-response": [
+   "A staff member taps a link in a text pretending to be a courier. Malware lands. The next morning an analyst spots odd traffic and follows the plan: isolate, find out what happened, clean, recover, learn. Amara learns how data is classified and protected, the kinds of malware, and the stages of a response."
+  ],
+  "threat-intel-assets-security-testing": [
+   "A threat feed warns of a ransomware group that targets healthcare. Amara learns who attacks and why, how defenders use shared information about attackers, how old equipment becomes a risk, and how the clinic can test its readiness with scans, simulated attacks and team exercises."
+  ]
+ },
+ "epilogue": [
+  "The week before her exam, a new phishing email lands. Amara spots it in seconds, reports it, and explains calmly what to do. She smiles: her first test of the real world was passed before the exam even started."
+ ],
+ "bad": {
+  "cia-risk-controls-ethics": [
+   "Amara hears that buying insurance ‘transfers the risk’ and relaxes. After a breach, the customers still blame Brookside. The insurer pays for the cost, but the clinic is still accountable for what happened. It is rather like hiring a taxi after you have crashed the car: the bill moves, the blame does not."
+  ],
+  "governance-policies-compliance": [
+   "A colleague writes a security policy that says ‘staff should consider using strong passwords’. Amara notes that ‘should’ and ‘consider’ make it a guideline, not a policy. Nobody has to follow it. The password ‘password1’ is delighted."
+  ],
+  "identity-access-management": [
+   "The clinic’s ‘multi-factor’ sign-in asks for a password and a security question. Amara points out that both are things you know, so it is one factor used twice. A second factor must be a different kind: something you have or something you are. A mother’s maiden name, sadly, is not a fingerprint."
+  ],
+  "networking-fundamentals": [
+   "A staff member sets up remote access to the clinic’s server using the old, clear-text method ‘because it is already there’. The next week, the log shows strangers from the internet trying it. The encrypted version was the one to choose. The old one is called Telnet, and it is exactly as private as it sounds."
+  ],
+  "cloud-segmentation-zero-trust": [
+   "The team assumes that the provider’s breach would be the major risk. The actual breach is a backup bucket that someone set to public, by mistake. Most cloud incidents are customer configuration errors, not clever attackers. The provider’s locks were excellent. Someone left the window open."
+  ],
+  "operations-malware-incident-response": [
+   "During the text-message attack, someone wipes the infected laptop immediately ‘to be safe’. The evidence goes with it. The response plan says to contain first, then clean, then learn. Preparation comes before everything. The laptop, shiny and empty, tells us nothing."
+  ],
+  "threat-intel-assets-security-testing": [
+   "The clinic hires someone for a ‘security test’ and does not agree the scope or get written permission. The tester scans a neighbour’s network by accident. A scan without permission is not a test; it is an incident. The neighbour is not amused. Neither is the lawyer."
+  ]
+ },
+ "review": {
+  "cia-risk-controls-ethics": {
+   "problem": "Security decisions are made without a clear idea of what is being protected or why.",
+   "cause": "The goals of security, the nature of risk and the types of control are not clearly defined.",
+   "solution": "CIA, risk treatment, controls and ethics give shared language and a way to choose.",
+   "next": "Next, policies, laws and standards."
+  },
+  "governance-policies-compliance": {
+   "problem": "Rules are vague and nobody knows which ones apply.",
+   "cause": "Policies, standards, laws and frameworks are mixed up.",
+   "solution": "Policy, standard, procedure and guideline, and the main laws and frameworks, give a structure.",
+   "next": "Next, who can access what."
+  },
+  "identity-access-management": {
+   "problem": "People have more access than they need, and proof of identity is weak.",
+   "cause": "Access is granted by habit and never reviewed.",
+   "solution": "Identification, authentication, authorisation, least privilege and lifecycle reviews fix it.",
+   "next": "Next, networking basics."
+  },
+  "networking-fundamentals": {
+   "problem": "Network traffic is not understood well enough to defend.",
+   "cause": "Addresses, ports and protocols are treated as magic.",
+   "solution": "Addresses, ports, the OSI model, firewalls and detection devices explain how traffic flows and is filtered.",
+   "next": "Next, cloud security and zero trust."
+  },
+  "cloud-segmentation-zero-trust": {
+   "problem": "Cloud misconfiguration exposes data.",
+   "cause": "Responsibility is unclear and everything sits in one big flat network.",
+   "solution": "Service and deployment models, shared responsibility, segmentation and Zero Trust limit mistakes and damage.",
+   "next": "Next, operations, malware and incident response."
+  },
+  "operations-malware-incident-response": {
+   "problem": "Attacks happen, and the response is improvised.",
+   "cause": "There is no classification of data, no plan and no evidence handling.",
+   "solution": "Data protection, malware knowledge and the incident lifecycle provide a plan.",
+   "next": "Next, threat intelligence and testing."
+  },
+  "threat-intel-assets-security-testing": {
+   "problem": "Defenders do not know who is attacking or whether they are ready.",
+   "cause": "Intelligence is not used and tests are unscoped.",
+   "solution": "Threat intelligence, asset tracking, team exercises and properly scoped tests prepare defences.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

@@ -1,0 +1,172 @@
+{
+ "hero": "Sofia Lindqvist",
+ "intro": [
+  "Sofia Lindqvist is a software architect at Kestrel Parcel, a delivery company that is building a returns assistant, a research agent and a code-review pipeline on top of Claude. She has to decide how agents loop, how tools are described, how instructions are shared across teams and what a human should check. She prepares for the CCAR-F while she builds.",
+  "Follow Sofia as the pieces come together, one design decision at a time."
+ ],
+ "beats": {
+  "agentic-loop-and-task-decomposition": [
+   "The first prototype of the returns assistant quits halfway whenever a reply contains text. Sofia finds the loop was stopping on the wrong signal. She rebuilds it to continue while the model asks to use a tool, to finish only when it signals it is done, and to send the full history back each time. She also learns when a fixed chain of steps beats letting the model decide."
+  ],
+  "coordinator-subagent-orchestration": [
+   "The research agent has to answer how small cities prepare for extreme heat. Sofia has a coordinator split the question into three parts and launch a helper for each. The helpers know nothing except what they are told, so each gets a clear brief. Sofia learns how to define helpers, pass context explicitly, run them in parallel, and refine the results."
+  ],
+  "enforcement-hooks-and-handoffs": [
+   "The billing agent must never apply a credit before the account has been verified. A line in the prompt asking nicely is not enough. Sofia adds a gate in code that blocks the credit tool until the lookup has returned a verified account, and a hook that checks limits before anything runs. She also designs the hand-off to a human, with everything they need in one place."
+  ],
+  "sessions-resume-and-fork": [
+   "An engineer names a session and spends two days mapping the billing module. A teammate then refactors five files. Sofia learns to resume and tell the agent which files changed instead of trusting stale results, to fork a session to try two approaches from the same starting point, and when to start fresh with a summary."
+  ],
+  "tool-design-errors-and-distribution": [
+   "The logistics assistant sends tracking numbers to the order-lookup tool, because both descriptions are one line long. Sofia rewrites them with accepted formats, examples and when not to use each. She learns to return errors that tell the agent what to do next, to give each role only the tools it needs, and what forcing a tool choice does and does not guarantee."
+  ],
+  "mcp-integration-and-built-in-tools": [
+   "The team commits a shared tool-server configuration that reads its token from an environment variable, while one developer keeps an experimental server in her personal settings. Sofia learns how scope decides who sees which server, how tools, resources and prompts differ, and when to use search, read, write or edit in the built-in toolkit."
+  ],
+  "claude-md-hierarchy-rules-and-imports": [
+   "The monorepo’s instruction file has grown to 550 lines, and a new hire reports that Claude ignores naming rules everyone else sees, because a senior engineer saved them in a personal file. Sofia learns where instruction files live and who receives them, how to split them into modules, and how to scope rules to the paths they apply to."
+  ],
+  "skills-commands-and-plan-mode": [
+   "The platform team ships three workflows. One produces long intermediate output, so it runs in its own forked context. One is dangerous, so only a person can trigger it. Sofia learns when something belongs in a skill and when in an instruction file, and when plan mode is better than just doing the work."
+  ],
+  "iterative-refinement-and-ci-pipelines": [
+   "The code-review pipeline runs Claude non-interactively and posts each finding as a comment. Sofia learns to give concrete input and output examples, to drive work with tests, to let the model interview her before building, and to run it in automation with structured output and a fresh instance for each job."
+  ],
+  "criteria-few-shot-and-schema-output": [
+   "The invoice reader returns bad JSON one time in two hundred, invents order numbers for suppliers who have none, and labels vague tickets with confident guesses. Sofia replaces vague instructions with explicit criteria, adds examples for borderline cases, and moves from asking for JSON to enforcing a schema with fields that may be empty."
+  ],
+  "validation-retry-batch-and-review": [
+   "An insurer extracts data from forty thousand scanned documents a week. Sofia has results checked in code, retries failures once with the exact error, and sends what still fails to a person. The overnight volume goes through the batch interface at lower cost, and an independent pass reviews the risky ones."
+  ],
+  "context-facts-escalation-and-errors": [
+   "A customer disputes three orders in one conversation. Sofia keeps a short facts block with each order’s details so they survive summarising, and trims huge lookup results to the fields that matter. She also learns when the agent must hand over to a human, and how a failure travels back from a helper with enough detail to act on."
+  ],
+  "long-sessions-human-review-and-provenance": [
+   "Mapping a million-line billing system takes a coordinator and five exploration helpers. They write notes to files and save state so that a crash on day two does not lose everything. Sofia learns how to keep long work coherent, how to sample and calibrate human review, and how to keep every claim traceable to its source."
+  ]
+ },
+ "epilogue": [
+  "Kestrel’s agents are in production with gates, hooks, clear tool descriptions and a human in the right places. On exam day Sofia notices that each question is really a design review: what is the failure, and which mechanism, enforced in code and not just asked for in a prompt, prevents it?"
+ ],
+ "bad": {
+  "agentic-loop-and-task-decomposition": [
+   "Sofia’s first loop ends the moment the model says anything with the word ‘done’ in it. One morning the model says, ‘I’m not done yet, but here is a thought’, and the loop goes home early. The stop reason is the signal, not the vocabulary. The model, in its defence, was only thinking aloud."
+  ],
+  "coordinator-subagent-orchestration": [
+   "Sofia launches a helper with the prompt ‘Use the earlier results to continue.’ The helper, who has never seen the earlier results, stares into the middle distance and produces a lovely essay on something else. Helpers inherit nothing. A brief that begins ‘as before’ is a brief addressed to nobody."
+  ],
+  "enforcement-hooks-and-handoffs": [
+   "The billing agent’s instructions say, in bold, ‘NEVER apply a credit above $50 without approval’. On day three, a persuasive customer and a patient model reach an understanding. A hook that rejects the call in code would have ignored the persuasion. Bold text is not a rule; code is."
+  ],
+  "sessions-resume-and-fork": [
+   "Sofia resumes a session from yesterday, forgetting that her teammate rewrote five files overnight. The agent, faithful to its memory, confidently describes code that no longer exists. Sessions store conversations, not files. Telling it what changed was the missing step."
+  ],
+  "tool-design-errors-and-distribution": [
+   "When the shipment service is down, the tool returns ‘no results’. The assistant happily tells customers their parcels do not exist. A real empty result and an outage look the same, until someone returns a proper error. Several parcels, found later, are delighted to exist."
+  ],
+  "mcp-integration-and-built-in-tools": [
+   "A developer commits the project’s tool configuration with the real token in it. Within the hour the token is in a repository that forty people can read. It should have been an environment variable. The token is rotated, the developer is thanked for making the point so memorably, and a lesson is learned about ${VAR}."
+  ],
+  "claude-md-hierarchy-rules-and-imports": [
+   "The senior engineer writes a bold line in the instruction file: ‘NEVER touch the payments folder.’ Claude edits the payments folder with great courtesy. The line was advice, not a block. A deny rule or a hook would have stopped it. The folder, for the record, was edited correctly."
+  ],
+  "skills-commands-and-plan-mode": [
+   "A teammate writes a lovely slash command in his own home directory and tells everyone to use it. Nobody can find it. It lives in his personal folder, and only files committed to the repository reach the team. The command is excellent. It is also invisible, like a very good idea in a locked drawer."
+  ],
+  "iterative-refinement-and-ci-pipelines": [
+   "The pipeline step runs Claude without the non-interactive flag. It waits, politely, for someone to answer a question. Nobody is there. The build hangs for six hours. It has not failed; it is simply patient. The flag that makes the run non-interactive is the difference between a pipeline and a waiting room."
+  ],
+  "criteria-few-shot-and-schema-output": [
+   "The prompt says: ‘Only report findings you are confident about.’ The model is confident about nearly everything and reports it all. Confidence is not a criterion. Sofia replaces it with explicit report-and-skip rules. The reports shrink and, for the first time, the developers read them."
+  ],
+  "validation-retry-batch-and-review": [
+   "A document has no total at all, and the pipeline keeps retrying the extraction, hoping it will find one. The total is not in the document. No amount of trying will conjure a number that was never printed. Missing information needs routing to a person, not another attempt."
+  ],
+  "context-facts-escalation-and-errors": [
+   "The assistant summarises a long conversation and, in the process, turns a refund of $124.50 into ‘about $125’. The customer notices. Exact figures do not survive summaries unless they are kept in a block that is never summarised. Summarising is lossy; money should not be."
+  ],
+  "long-sessions-human-review-and-provenance": [
+   "The team reports a 97 percent overall accuracy and reduces the human review. The 3 percent turns out to be almost entirely one document type, which is wrong a third of the time. An overall number hides the pockets. Validate each segment before relaxing review."
+  ]
+ },
+ "review": {
+  "agentic-loop-and-task-decomposition": {
+   "problem": "Agents quit early or run forever.",
+   "cause": "Loops stop on the wrong signal and history is not returned.",
+   "solution": "The loop continues on tool use and ends on the end-of-turn signal, with full history and sensible task decomposition.",
+   "next": "Next, coordinators and subagents."
+  },
+  "coordinator-subagent-orchestration": {
+   "problem": "One agent cannot cover a big task well.",
+   "cause": "Helpers get no context and the split is too narrow.",
+   "solution": "Hub-and-spoke orchestration, explicit context passing, parallel launches and refinement cover the work.",
+   "next": "Next, enforcement and hand-offs."
+  },
+  "enforcement-hooks-and-handoffs": {
+   "problem": "Prompts are ignored when it matters.",
+   "cause": "Rules are asked for, not enforced.",
+   "solution": "Gates, hooks and structured hand-offs enforce rules in code.",
+   "next": "Next, sessions."
+  },
+  "sessions-resume-and-fork": {
+   "problem": "Long work is lost or confused between sessions.",
+   "cause": "Conversations are stored but files change.",
+   "solution": "Named sessions, resume, fork and fresh starts with summaries preserve useful state.",
+   "next": "Next, tool descriptions and errors."
+  },
+  "tool-design-errors-and-distribution": {
+   "problem": "Agents pick the wrong tool or mishandle failures.",
+   "cause": "Descriptions overlap and errors are vague.",
+   "solution": "Clear descriptions, structured errors and scoped tool access guide the agent.",
+   "next": "Next, MCP and built-in tools."
+  },
+  "mcp-integration-and-built-in-tools": {
+   "problem": "Tools are configured in ways that leak or conflict.",
+   "cause": "Scopes and secrets are mishandled.",
+   "solution": "Project and user scope, environment variables and the right built-in tool for the job organise tools.",
+   "next": "Next, instruction files."
+  },
+  "claude-md-hierarchy-rules-and-imports": {
+   "problem": "Instructions are bloated, personal or ignored.",
+   "cause": "Files are in the wrong place and loaded everywhere.",
+   "solution": "The hierarchy, imports and path-scoped rules deliver the right guidance to the right people and files.",
+   "next": "Next, skills, commands and plan mode."
+  },
+  "skills-commands-and-plan-mode": {
+   "problem": "Repeated workflows are redone by hand.",
+   "cause": "Commands are personal and long workflows clutter context.",
+   "solution": "Skills and commands, forked context and plan mode package and plan work.",
+   "next": "Next, iterative refinement and CI."
+  },
+  "iterative-refinement-and-ci-pipelines": {
+   "problem": "Results need improvement and automation needs structure.",
+   "cause": "Vague feedback and interactive runs in pipelines.",
+   "solution": "Examples, test-driven iteration, non-interactive runs and structured output automate review.",
+   "next": "Next, criteria and structured output."
+  },
+  "criteria-few-shot-and-schema-output": {
+   "problem": "Reports are noisy and output breaks parsers.",
+   "cause": "Criteria are vague and format is asked for, not enforced.",
+   "solution": "Explicit criteria, examples and enforced schemas give consistent, parsable output.",
+   "next": "Next, validation and review."
+  },
+  "validation-retry-batch-and-review": {
+   "problem": "Bad extractions slip through and costs are high.",
+   "cause": "Retries are blind and batch is misused.",
+   "solution": "Validation in code, informed retries, batch for latency-tolerant work and independent review fix it.",
+   "next": "Next, long conversations and escalation."
+  },
+  "context-facts-escalation-and-errors": {
+   "problem": "Facts blur in long conversations and cases are escalated wrongly.",
+   "cause": "Summaries lose detail and escalation signals are unreliable.",
+   "solution": "Fact blocks, trimming, clear escalation triggers and structured errors keep accuracy.",
+   "next": "Next, long sessions and review."
+  },
+  "long-sessions-human-review-and-provenance": {
+   "problem": "Long work degrades and review is guesswork.",
+   "cause": "Context decays and accuracy is judged in aggregate.",
+   "solution": "Scratchpads, manifests, calibrated sampling and provenance keep long work reliable and checkable.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

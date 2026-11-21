@@ -1,0 +1,88 @@
+{
+ "hero": "Fatima Zahra",
+ "intro": [
+  "Fatima Zahra has just been given a title she did not ask for: Identity and Access Administrator at Meridian Energy, a utility with offices in three countries. Every other security team depends on the thing she now owns: who can sign in, and to what. She starts SC-300 on her first day.",
+  "Follow Fatima as she builds Meridian’s identity layer one decision at a time."
+ ],
+ "beats": {
+  "entra-user-identities": [
+   "Meridian keeps its HR data in three regional directories. Sign-in must keep working even if one region’s servers go down overnight for maintenance. Fatima learns the options for syncing and signing in, how to delegate administration region by region, how groups can fill themselves from rules, and how to invite partners from outside the company."
+  ],
+  "authentication-methods-selfservice": [
+   "Fatima’s company has just rolled out passwordless sign-in, yet new hires still get a temporary password by email on day one. That is the weakest link in the chain. She learns about stronger methods, the one-time pass for onboarding, how password reset can be self-service, and how to defend against users being worn down by endless approval prompts."
+  ],
+  "conditional-access-risk": [
+   "Admins will soon need phishing-resistant sign-in. Fatima is afraid of locking out an admin who has not yet registered the right key. She learns to run the new policy in report-only mode first, read the results, and then turn it on. She also learns how risk signals, locations and authentication strength combine into one access decision."
+  ],
+  "workload-identities-apps": [
+   "Meridian’s deployments run from GitHub, using a secret that quietly expired one day and took down a release. Fatima learns to register apps, how services get their own identities, how to avoid long-lived secrets altogether, and the difference between permissions an app has for itself and permissions it borrows from the signed-in user."
+  ],
+  "identity-governance-pim": [
+   "On-call engineers need an admin role during their week on call, not forever. Fatima sets up eligibility with approval, justification and a time limit. She also builds packages of access that new staff and partners can request, reviews that remove stale access, and emergency accounts that are kept for the day everything else fails."
+  ],
+  "global-secure-access": [
+   "Meridian’s VPN is old and slow. Fatima learns how a client on each device can send internet, private and Microsoft traffic through a cloud service, with sign-in policies attached to each. Payroll gets its own per-app access with the strongest sign-in, and the VPN is finally retired."
+  ]
+ },
+ "epilogue": [
+  "Meridian’s identity layer now does what it should: the right people, the right access, for the right time. Fatima sits the exam knowing that every question is really asking, who is this, what do they need, and how long should they have it?"
+ ],
+ "bad": {
+  "entra-user-identities": [
+   "Fatima is a Global Administrator and assumes this lets her manage the Azure subscriptions too. It does not; it is a different system with a different set of roles. She stares at an ‘access denied’ with great dignity. She finds out how to elevate her access, on purpose, for the length of the task."
+  ],
+  "authentication-methods-selfservice": [
+   "Fatima tells staff that text-message codes are the ‘strongest’ sign-in available. A security consultant, who happens to be in the room, winces. Strongest and phishing-resistant are different things, and the hardware keys at the back of the cupboard are better. Fatima buys keys."
+  ],
+  "conditional-access-risk": [
+   "Fatima writes two Conditional Access policies and expects one of them to ‘win’. Both apply, and the user must satisfy both. It is an AND, not an OR. A confused sales manager is asked for three different proofs of identity to read a calendar. He asks, reasonably, whether he is boarding a plane."
+  ],
+  "workload-identities-apps": [
+   "Fatima stores the app’s secret in a repository variable with a two-year expiry and puts the expiry date in nobody’s calendar. Two years later, it expires on a Saturday night. The deployments stop and nobody knows why. Federating the identity, with no secret to expire at all, was the answer."
+  ],
+  "identity-governance-pim": [
+   "Fatima sets up eligible assignments with approval, then approves her own request, because she is the approver. The approval requirement was meant to be a second pair of eyes. A colleague draws a very large arrow pointing from ‘Approver’ to ‘someone else’."
+  ],
+  "global-secure-access": [
+   "Fatima excludes a destination from the Microsoft traffic profile and assumes it now flows through the Internet profile. It does not; it goes straight out, unprotected, like a toddler who has discovered the front door. The destination is added to the right profile. The door gets a lock."
+  ]
+ },
+ "review": {
+  "entra-user-identities": {
+   "problem": "Users, groups and external partners are managed in several places with inconsistent rules.",
+   "cause": "Identity data comes from separate directories, and admin rights are broad.",
+   "solution": "Hybrid sync options, administrative units, dynamic groups and B2B collaboration organise and limit.",
+   "next": "Next, how users prove who they are."
+  },
+  "authentication-methods-selfservice": {
+   "problem": "Weak sign-in methods and onboarding gaps let attackers in.",
+   "cause": "Passwords and one-time texts can be phished, and temporary credentials are weak.",
+   "solution": "Stronger methods, SSPR, temporary access passes and a modern methods policy raise the bar.",
+   "next": "Next, deciding access with Conditional Access and risk."
+  },
+  "conditional-access-risk": {
+   "problem": "Access decisions ignore the context of the sign-in.",
+   "cause": "Every user is treated the same regardless of risk, place or device.",
+   "solution": "Conditional Access policies, risk signals and authentication strength decide, and report-only mode lets you test first.",
+   "next": "Next, identities for apps and machines."
+  },
+  "workload-identities-apps": {
+   "problem": "Apps and services need identities and secrets get stolen or expire.",
+   "cause": "Apps use shared passwords or long-lived secrets.",
+   "solution": "App registrations, service principals, managed identities and federation give apps safe identities.",
+   "next": "Next, governing privileged and everyday access."
+  },
+  "identity-governance-pim": {
+   "problem": "Access builds up and powerful roles are always on.",
+   "cause": "Nobody reviews, and nothing expires.",
+   "solution": "PIM, access packages, reviews, terms of use and lifecycle automation add time limits and review.",
+   "next": "Next, replacing the VPN with identity-based network access."
+  },
+  "global-secure-access": {
+   "problem": "VPNs give broad network access and slow connections.",
+   "cause": "Access is based on network location, not identity and app.",
+   "solution": "Global Secure Access, forwarding profiles and per-app access apply identity-based policy to traffic.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

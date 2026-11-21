@@ -1,0 +1,88 @@
+{
+ "hero": "Grace Mbeki",
+ "intro": [
+  "Grace Mbeki is a systems administrator at Pinecrest Health, a mid-sized clinic network that has outgrown its server room. She has been asked to help move to the cloud. Her manager has said, kindly, that nobody expects her to know everything, only to choose well. She starts studying for CompTIA Cloud+.",
+  "Follow Grace through Pinecrest’s move to the cloud and the first year of running it."
+ ],
+ "beats": {
+  "deployment-models-virtualization": [
+   "A university, a research lab and Pinecrest all need to work under the same research-compliance rules, and none wants to build the infrastructure alone. Grace learns that sharing one built for a community is a model of its own, alongside public, private and hybrid. She also learns what sits underneath: the hypervisor, virtual machines and containers."
+  ],
+  "scaling-resilience-storage": [
+   "For a one-day flash sale at the clinic’s online pharmacy, Pinecrest cannot afford to keep peak capacity running all year. Grace learns to add and remove instances automatically behind a load balancer. She also learns the difference between staying up and recovering fast, how recovery targets are set, and which kind of storage suits which job."
+  ],
+  "security-fundamentals": [
+   "Pinecrest’s public web and mail servers are going into a protected zone between two firewalls, so a compromise there does not reach patient systems. Grace learns who gets to do what and how that is checked, how data is protected at rest and in transit, and how the network watches for attacks."
+  ],
+  "deployment-strategies": [
+   "Pinecrest’s old physical file server is moved as-is into a cloud VM, then described in code so it can be rebuilt on demand. Grace learns safe ways to release new versions to a few users first, the different kinds of backup, how sites are kept ready for disaster, and how to automate provisioning and releases."
+  ],
+  "operations-governance": [
+   "Before setting any alert, Grace’s team watches normal behaviour for weeks, so they do not drown in false alarms. They report cost by department, track every change, and record what runs where. She learns that cloud operations is as much about habits and records as it is about technology."
+  ],
+  "troubleshooting-methodology": [
+   "A user says one VM feels slow. Grace does not resize it. She identifies the symptom, forms a theory (a noisy neighbour on the same host), tests it, and only then acts, and records what she found. The method works the same for network, storage and permissions problems."
+  ]
+ },
+ "epilogue": [
+  "On the day of the exam Grace thinks about the clinic’s new cloud setup: a model chosen for reasons, a plan for growth, security in layers, tested releases and a habit of asking, “what do we know, and what is our theory?” She starts reading, one scenario at a time."
+ ],
+ "bad": {
+  "deployment-models-virtualization": [
+   "Grace runs one project on one cloud and another on a different cloud and tells her manager, with pride, that Pinecrest has a ‘hybrid cloud’. It does not. Hybrid means connected and coordinated environments, not two separate islands that have never met. Her manager, who learned the word last week, is nonetheless sure it is hybrid."
+  ],
+  "scaling-resilience-storage": [
+   "A colleague sets up two disks in RAID 0 ‘for safety’, because the data is spread across both. It is spread across both, and if either fails, it is gone from both. RAID 0 is faster and has no protection whatsoever. The colleague is advised to buy a different RAID and a different mug."
+  ],
+  "security-fundamentals": [
+   "Someone discovers that the intrusion detection system has detected an attack and concludes that it was stopped. It was detected and written to a log. A system that only detects does not block anything; only one that sits in the path can. The attack, meanwhile, enjoyed its stay."
+  ],
+  "deployment-strategies": [
+   "A team backs up with incremental backups and, when the disaster arrives, restores the latest incremental only. It is a lovely small file and contains nothing useful on its own. A restore needs the full backup and every incremental since, in order. The team learns this at 3 a.m., which is when most such lessons are delivered."
+  ],
+  "operations-governance": [
+   "Someone sets an alert at 70 percent CPU on the first day, without watching normal behaviour. The system normally runs at 75 percent. By lunchtime the team has received 400 alerts and has muted the channel. The one genuine alert, on Thursday, goes unheard. A baseline would have prevented the whole sorry episode."
+  ],
+  "troubleshooting-methodology": [
+   "A support engineer is told that a VM feels slow, buys more bandwidth, and is surprised that it still feels slow. Latency and bandwidth are different things; one is how long a trip takes and the other is how wide the road is. A bigger road does not make a traffic light change faster."
+  ]
+ },
+ "review": {
+  "deployment-models-virtualization": {
+   "problem": "Pinecrest must choose where to run systems and how.",
+   "cause": "The deployment and service models blur together, and virtualisation hides what actually runs.",
+   "solution": "Public, private, hybrid and community clouds, service models and the hypervisor, VM and container layers give clear definitions.",
+   "next": "Next, scaling, resilience and storage."
+  },
+  "scaling-resilience-storage": {
+   "problem": "Demand spikes and failures threaten availability.",
+   "cause": "Capacity is fixed, and failure protection is confused with performance.",
+   "solution": "Scaling styles, high availability, fault tolerance, recovery targets, storage types and RAID levels match need.",
+   "next": "Next, security fundamentals."
+  },
+  "security-fundamentals": {
+   "problem": "Systems and data are exposed to the wrong people and to attackers.",
+   "cause": "Identity, encryption and network defences each cover only part of the risk.",
+   "solution": "AAA, access models, encryption at rest and in transit, Zero Trust and network tools layer protection.",
+   "next": "Next, releasing and migrating safely."
+  },
+  "deployment-strategies": {
+   "problem": "Releases fail, migrations disrupt and restores do not work.",
+   "cause": "Changes go live all at once, and backup types are misunderstood.",
+   "solution": "Blue-green and canary releases, backup types, DR sites, migration paths and IaC make changes safe and repeatable.",
+   "next": "Next, day-to-day operations and governance."
+  },
+  "operations-governance": {
+   "problem": "Operations drift, costs grow and alerts are noise.",
+   "cause": "No baselines, no records and no ownership of cost.",
+   "solution": "Automation, orchestration, baselines, thresholds, SLAs, chargeback and change control keep operations steady.",
+   "next": "Next, troubleshooting."
+  },
+  "troubleshooting-methodology": {
+   "problem": "Problems are fixed by guesswork.",
+   "cause": "Fixes are tried before the cause is understood.",
+   "solution": "A methodology, identify, theorise, test, plan, implement, verify, document, plus familiar failure categories give a repeatable approach.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

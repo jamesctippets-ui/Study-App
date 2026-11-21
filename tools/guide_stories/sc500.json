@@ -1,0 +1,76 @@
+{
+ "hero": "Hiroshi Tanaka",
+ "intro": [
+  "Hiroshi Tanaka is a security engineer at Kestrel Logistics. The company is moving fast into cloud and AI: copilots for staff, agents that touch live systems, and a lot of data in places nobody has fully mapped. Hiroshi’s job is to make it safe without making it slow, and SC-500 is how he is organising what he needs to know.",
+  "Follow Hiroshi as he secures Kestrel’s cloud and AI estate."
+ ],
+ "beats": {
+  "identity-access-governance": [
+   "A leaked account is disabled, but the attacker still holds a token that would be valid for another hour. Hiroshi learns how apps can be told about the change within minutes rather than waiting for expiry. He also sets up trust with partner tenants, secret-free identities for workloads, packages of access, and privileged roles that are only active when needed."
+  ],
+  "network-perimeter-security": [
+   "Kestrel’s administrators must reach production VMs without those VMs ever having a public address, and outbound traffic should be inspected even inside encrypted connections. Hiroshi works through the layers: rules on subnets and groups of machines, a central firewall, a web application filter in a test mode before enforcing, and protection from floods of traffic."
+  ],
+  "data-secrets-protection": [
+   "Compliance wants a salary column encrypted even from administrators, and separately wants ordinary support staff to stop seeing it. Those are two different requirements with two different tools. Hiroshi also learns how secrets and keys are stored and who may use them, how storage accounts are accessed, and how databases are encrypted and monitored."
+  ],
+  "ai-workload-security": [
+   "A financial customer wants an AI workload protected so tightly that even the cloud provider cannot see the data while it is being processed. Hiroshi learns the levels of encryption, from disks to hosts to confidential computing, how containers and apps are hardened, and how each AI agent gets its own identity and limits so it cannot act as a blank cheque."
+  ],
+  "security-posture-ops": [
+   "Leadership wants one trending number. The auditor wants proof for a specific standard. Hiroshi learns that these are different views of the same environment. He connects data sources, writes detection rules, automates responses, and extends coverage across more than one cloud. The picture of Kestrel’s security is finally in one place."
+  ]
+ },
+ "epilogue": [
+  "Kestrel’s AI rollout goes ahead on schedule, safely. On exam day Hiroshi finds that nearly every scenario has a tension in it: easy versus safe, fast versus controlled. He has learned to ask which requirement is non-negotiable, and to choose from there."
+ ],
+ "bad": {
+  "identity-access-governance": [
+   "After the credentials leak, Hiroshi shortens the token lifetime for the future and considers the matter closed. The attacker’s existing token, issued twenty minutes earlier, is still valid. Shorter lifetimes reduce tomorrow’s exposure; they do nothing about today’s token. The real answer is to make apps check again straight after the account is disabled."
+  ],
+  "network-perimeter-security": [
+   "A team peers a spoke to the hub and declares that all traffic ‘goes through the firewall’. Nobody added the routes that force it there, so the traffic takes the shortcut, like a shopper who has noticed that the door marked ‘Exit’ is also marked ‘Shortcut’. User-defined routes were the missing signposts."
+  ],
+  "data-secrets-protection": [
+   "Hiroshi switches the Key Vault to RBAC and leaves the old access policies in place, assuming both apply. They do not; the old ones are simply ignored. Half of the team promptly loses access to their secrets on a Monday morning. The other half has a sense of calm superiority that does not last."
+  ],
+  "ai-workload-security": [
+   "Hiroshi enables disk encryption and tells the financial customer that even the provider cannot see the data. The customer asks about data while it is being processed. Hiroshi pauses. Disk encryption protects data at rest, not in use; only confidential computing covers that. He drafts a better answer and a better coffee order."
+  ],
+  "security-posture-ops": [
+   "Hiroshi presents a Secure Score of 82 percent to the auditor as proof of compliance with the payment standard. The auditor smiles kindly and asks for the compliance dashboard for that standard. The Secure Score measures general good practice, not a specific rulebook. The auditor is very patient and has seen this before."
+  ]
+ },
+ "review": {
+  "identity-access-governance": {
+   "problem": "Access tokens, partner access and privileged roles outlive the event that should end them.",
+   "cause": "Tokens are valid until they expire, and directory roles, partner access and admin rights are not reviewed.",
+   "solution": "Continuous access evaluation, cross-tenant settings, workload federation, managed identities and PIM react to changes and limit exposure.",
+   "next": "Next, the network perimeter."
+  },
+  "network-perimeter-security": {
+   "problem": "Traffic enters and leaves cloud networks unseen.",
+   "cause": "Rules and routes are incomplete, and encryption is not assumed.",
+   "solution": "NSGs, firewalls, WAF, Bastion, DDoS protection and forced routing filter and inspect traffic.",
+   "next": "Next, protecting data and secrets."
+  },
+  "data-secrets-protection": {
+   "problem": "Keys, secrets and data are accessible to too many.",
+   "cause": "Access models are mixed, and old keys and tokens remain.",
+   "solution": "Key Vault models, Entra authorisation for storage, SQL encryption and masking, and customer-managed keys narrow and protect.",
+   "next": "Next, securing compute and AI workloads."
+  },
+  "ai-workload-security": {
+   "problem": "Workloads and AI agents have access beyond what they need and data in use is exposed.",
+   "cause": "Encryption covers storage but not processing, and agents get broad rights ‘just in case’.",
+   "solution": "Encryption levels, confidential computing, container hardening and scoped agent identities reduce risk.",
+   "next": "Next, posture and monitoring."
+  },
+  "security-posture-ops": {
+   "problem": "Leadership and auditors want proof, and security teams want detection.",
+   "cause": "Posture, compliance and detection are measured in different places.",
+   "solution": "Secure Score, compliance dashboards, Defender plans, Sentinel rules and automation give each view.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

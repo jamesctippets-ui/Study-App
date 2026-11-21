@@ -1,0 +1,100 @@
+{
+ "hero": "Jordan Ellis",
+ "intro": [
+  "Jordan Ellis has just been hired as the first cloud administrator at Redfern Health, a hospital group that has been putting things in Azure for a year with nobody quite in charge. Jordan’s boss hands over a list: tidy up access, control costs, fix storage, size the virtual machines, deploy the patient portal safely, lock down the network, and make sure nothing is lost if something fails.",
+  "Follow Jordan through the first months as Azure administrator, and through the AZ-104 syllabus."
+ ],
+ "beats": {
+  "identities-access": [
+   "Radiology is growing from eight staff to thirty. Jordan sees that adding each person to a group by hand will not scale, so Jordan builds a group that fills itself from department data and attaches the licence to the group. An external consultant needs temporary access as a guest, and there is also a self-service password reset to set up so the help desk stops getting calls at 8 a.m."
+  ],
+  "governance-cost": [
+   "The lead engineer, Sam, needs to manage everything in one resource group and decide who else can join, but Jordan does not want to hand over company-wide ownership. Jordan assigns the right role at the right scope. Next, a policy that stops resources being created in the wrong region, and a budget that emails a warning before the month’s spend runs away."
+  ],
+  "storage-management": [
+   "A marketing contractor must upload files to a single container for 48 hours only. Jordan creates a time-limited, narrowly scoped access signature instead of handing over an account key. The same storage account gets a firewall, a rule that moves old blobs to cheaper tiers, and versioning with soft delete, so a mistaken overwrite can be undone."
+  ],
+  "vms-compute": [
+   "The patient records database needs steady, fast disks. The web front ends spike during business hours and are idle at night. Jordan picks a larger memory-optimised size with premium disks for the database, and spreads the front ends across availability zones. A VM that is too small can be resized, but Jordan learns it will restart, so that has to be planned."
+  ],
+  "app-hosting-iac": [
+   "The patient portal needs an update, and nobody wants to test it on the live site. Jordan deploys the new version to a staging slot, runs the checks against it, and swaps it into production in seconds, with the option to swap back. To stop the environment being rebuilt by hand next time, Jordan writes it down as a template that can be deployed again and previewed before it runs."
+  ],
+  "az104-networking": [
+   "After a scare, Jordan needs to block one suspicious address range from a subnet without breaking everything else. A deny rule only works if its priority number is lower than the allow rule it overrides. Jordan also peers two virtual networks, puts a load balancer in front of the web tier, and swaps public remote-desktop access for a secure bastion."
+  ],
+  "monitoring-recovery": [
+   "At 2 p.m. a bad script corrupts a database VM. Jordan restores it from that morning’s backup and loses a few hours of data, which is the price of the schedule. A regional outage is a different problem, which is what site recovery replication is for. Alerts and action groups mean the next problem finds Jordan, instead of the other way round."
+  ]
+ },
+ "epilogue": [
+  "Jordan’s manager has stopped sending lists. The hospital’s Azure estate is tidy, costs are predictable, and the next incident will be handled by alerts and backups. On exam day Jordan sees question after question that matches a situation from the past few months and realises the syllabus was the job description all along."
+ ],
+ "bad": {
+  "identities-access": [
+   "Jordan, in a hurry, adds each new radiology starter to a group by hand and attaches the licence to the individual instead of the group. Three starters later, one is missed, and spends a morning staring at a login that works but opens nothing. Jordan, humbled, builds the dynamic group the next day."
+  ],
+  "governance-cost": [
+   "Jordan gives Sam ‘Contributor’ on the resource group and says Sam can add the team. Sam cannot. Contributor can manage resources but not who may access them. After a short email exchange that begins ‘Hi, quick question’, Jordan assigns Owner on that one group, and nothing else."
+  ],
+  "storage-management": [
+   "To get the marketing contractor started quickly, Jordan emails the storage account key. The contractor, a lovely person, saves it in a document called ‘passwords.docx’. The key does not expire. Jordan spends the following weekend rotating it and learning why scoped, time-limited access signatures exist."
+  ],
+  "vms-compute": [
+   "Jordan puts the database on a cheap burstable VM because the price looks great. It runs perfectly for a week, then slows to a crawl under steady load, the way a sprinter slows after the first lap of a marathon. Jordan upgrades to a proper size and apologises to the radiologists."
+  ],
+  "app-hosting-iac": [
+   "The first portal update goes straight to production on a Friday afternoon, ‘because the testing looked fine’. It does not look fine at 4:45 p.m. Jordan swaps in the old version by hand, takes a long weekend off and writes a note to self: staging slot."
+  ],
+  "az104-networking": [
+   "Jordan adds a deny rule with priority 300 and an allow rule with priority 200, expecting the block to work. It does not. The lower number is evaluated first, the allow matches, and the suspicious range walks right in. Jordan fixes the numbers and promises never to trust the order they were typed in."
+  ],
+  "monitoring-recovery": [
+   "Jordan sets up backup but never tests a restore. When the corrupted database needs one, the restore works but takes longer than the clinic’s patience. Meanwhile, no alert existed for the original failure, so it was discovered by an annoyed nurse rather than a graph."
+  ]
+ },
+ "review": {
+  "identities-access": {
+   "problem": "People join, leave and move, and keeping their access right by hand does not scale.",
+   "cause": "Manual group membership and licensing depend on someone remembering to do it.",
+   "solution": "Dynamic groups, group-based licensing, guest access and self-service password reset keep identity current automatically.",
+   "next": "Next, who can do what, and what it all costs."
+  },
+  "governance-cost": {
+   "problem": "Someone has too much access, nobody knows what resources cost, and rules are not applied.",
+   "cause": "Permissions and spending are scattered across scopes, with no consistent policy.",
+   "solution": "Role assignments at the right scope, policies and initiatives, and budgets bring access, compliance and cost under control.",
+   "next": "Next, how to hand out access to data safely."
+  },
+  "storage-management": {
+   "problem": "Data must be shared and protected, and a leaked key can expose it all.",
+   "cause": "Account keys grant everything, and storage is open to the network by default in many setups.",
+   "solution": "Scoped, time-limited signatures, storage firewalls, lifecycle rules and versioning limit access and protect against loss.",
+   "next": "Next, the virtual machines that run the workloads."
+  },
+  "vms-compute": {
+   "problem": "Workloads are slow or expensive because the VM size and disk do not fit them.",
+   "cause": "Sizes, disks and availability options are chosen by habit, not by the job’s needs.",
+   "solution": "Matching series, disks and availability to the workload, and knowing what resizing involves, fixes both cost and performance.",
+   "next": "Next, hosting applications and deploying them repeatably."
+  },
+  "app-hosting-iac": {
+   "problem": "Updates are risky and environments are built differently every time.",
+   "cause": "Deployments go straight to live and are built by hand.",
+   "solution": "Staging slots, the right hosting choices and templates make releases safe and repeatable.",
+   "next": "Next, controlling traffic between all these pieces."
+  },
+  "az104-networking": {
+   "problem": "Traffic goes where it should not, or cannot reach where it should.",
+   "cause": "Rules are evaluated in an order people do not expect, and peering and load balancing have limits.",
+   "solution": "Priority-based rules, peering, load balancing and secure access to machines give controlled, reliable connectivity.",
+   "next": "Next, knowing when things go wrong and recovering from it."
+  },
+  "monitoring-recovery": {
+   "problem": "Failures are discovered late and recovery is untested.",
+   "cause": "Nobody is watching the right data, and backups are assumed to work.",
+   "solution": "Metrics, logs, alerts and action groups provide early warning, and backup and site recovery cover different kinds of loss.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

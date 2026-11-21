@@ -1,0 +1,112 @@
+{
+ "hero": "Helen Cho",
+ "intro": [
+  "Helen Cho is an information systems security manager at a federal agency that builds systems quickly and authorises them slowly. Her job is to guide each system through the Risk Management Framework from the first sketch to a signed authorisation. She prepares for CGRC to make sure she can do it by the book.",
+  "Follow Helen through the life of one system, from ‘prepare’ to ‘keep it authorised’."
+ ],
+ "beats": {
+  "governance-risk-program": [
+   "Three business units in Helen’s agency build similar systems, each with its own authorising official and its own view of acceptable risk. One unit’s approved system would not be approved in another. Helen learns how an organisation sets its risk strategy at the top, who plays which role, and how the framework’s steps tie them together."
+  ],
+  "frameworks-regulations": [
+   "A small contractor sells to U.S. and EU customers, takes card payments and has just won a subcontract involving controlled information. Helen helps them sort out which requirements are law, which are contractual and which are voluntary, and which frameworks and laws apply to which part of the business."
+  ],
+  "scope-categorization": [
+   "A student records portal is next. Helen helps the team list the information it holds, rate the impact of losing confidentiality, integrity or availability for each type, and take the highest value as the rating for the system. She also draws the boundary of what is in scope, and checks what privacy rules apply."
+  ],
+  "select-tailor": [
+   "A health agency has forty clinical applications, each tailored separately by a different team. Assessors keep finding the same decisions made differently. Helen learns to start from a baseline, adjust it with documented reasons, use overlays, and let controls provided centrally be inherited rather than reinvented."
+  ],
+  "implement-controls": [
+   "In review, the assessor finds that the plan says logging is handled by the provider, while the provider says it is the customer’s job. Helen learns that implementation statements must say who does what, how and with what evidence, and that every control needs an owner."
+  ],
+  "assess-controls": [
+   "An internal team that reports to the system owner finds that remote access logging was off for weeks. The owner asks for the finding to be removed. Helen learns why assessors must be independent, how assessments are planned and reported, and how weaknesses are tracked until they are fixed."
+  ],
+  "authorize-system": [
+   "A billing system has one high weakness that can be fixed in six weeks and several moderate ones with a credible plan. The project manager wants approval now. Helen learns what goes into an authorisation package, how the authorising official weighs risk, and the difference between full approval, a conditional one and a denial."
+  ],
+  "maintain-compliance": [
+   "A loan system is moving to a managed cloud. The owner treats it as routine, since the application is unchanged. Helen points out the hosting move changes the risk. She learns continuous monitoring, how to analyse the impact of changes, how to report posture, and how a system is properly retired."
+  ]
+ },
+ "epilogue": [
+  "After a year, Helen can follow any system through the framework from start to finish. She sits the exam thinking of the system she has just kept authorised, and the questions are the same ones she has been asking at every step: what is in scope, what is the risk, who decides, and what is the evidence?"
+ ],
+ "bad": {
+  "governance-risk-program": [
+   "Helen’s colleague says that the ISSO accepted the risk on the system. The ISSO, who was in the room, looks at the floor. Only the authorizing official may accept risk. The ISSO, however clever, however friendly, and however well they know the system, can only advise. A signature from the wrong person is a very expensive piece of paper."
+  ],
+  "frameworks-regulations": [
+   "A small contractor tells Helen that PCI DSS is ‘the law’ and that the lawyers will handle it. It is a contractual industry standard, not a statute. Meanwhile, the real laws are over there. The contractor’s lawyer, summoned, spends the afternoon sorting the pile."
+  ],
+  "scope-categorization": [
+   "A team averages the impact ratings for the portal and records it as ‘Low-Moderate’. There is no such category. The system takes the highest value across confidentiality, integrity and availability. The portal, with its student financial aid data, is Moderate, and has been the whole time."
+  ],
+  "select-tailor": [
+   "The forty teams all ‘scope out’ a control they cannot meet. Scoping removes a control that does not apply. If it applies and cannot be met as written, you need a compensating control. They had simply deleted a requirement because it was inconvenient. The assessor’s expression could have curdled milk."
+  ],
+  "implement-controls": [
+   "The plan lists three copies of the same firewall as ‘defence in depth’. Three of the same thing is redundancy, not depth. Depth means different layers. Helen suggests a firewall, a host control and monitoring. The three firewalls remain, as an interesting monument to enthusiasm."
+  ],
+  "assess-controls": [
+   "The internal assessor, who reports to the system owner, writes up the finding and, on the owner’s request, takes it out again. The finding was real. The assessment now has all the independence of a restaurant review written by the chef. Helen reinstates it and asks for a different assessor."
+  ],
+  "authorize-system": [
+   "The project manager says that the authorisation means the system is ‘certified secure’. It means that the authorizing official has accepted the remaining risk. A system with a weakness and a plan can be authorised; a system with a high weakness and no plan can be denied. A denial is a normal outcome, not a disaster."
+  ],
+  "maintain-compliance": [
+   "The system owner makes the change to the hosting platform first and asks for the impact analysis afterwards. The analysis is meant to come before the change. Doing it afterwards is like checking the weather forecast from the middle of the storm. It is accurate, and it is no help."
+  ]
+ },
+ "review": {
+  "governance-risk-program": {
+   "problem": "Each unit makes its own risk judgments, and nobody is clearly accountable.",
+   "cause": "No common strategy or roles.",
+   "solution": "Governance, the risk management strategy, defined roles and the RMF give one process.",
+   "next": "Next, which rules apply."
+  },
+  "frameworks-regulations": {
+   "problem": "Requirements from law, contract and choice are mixed up.",
+   "cause": "Frameworks and regulations overlap and differ in force.",
+   "solution": "Sorting legal, contractual and voluntary requirements and knowing the key ones clarifies what applies.",
+   "next": "Next, defining the system and its impact."
+  },
+  "scope-categorization": {
+   "problem": "Nobody agrees what is in the system or how important it is.",
+   "cause": "Boundaries and impact levels were not defined.",
+   "solution": "The authorization boundary, information types and FIPS 199 categorisation define scope and importance.",
+   "next": "Next, selecting and tailoring controls."
+  },
+  "select-tailor": {
+   "problem": "Each team picks controls differently.",
+   "cause": "No common baselines, tailoring rules or inheritance.",
+   "solution": "Baselines, tailoring, overlays and common controls make selection consistent.",
+   "next": "Next, implementing and documenting."
+  },
+  "implement-controls": {
+   "problem": "Controls are planned but not working or recorded.",
+   "cause": "Responsibilities are unclear and documentation conflicts.",
+   "solution": "Implementation statements, the security plan, ownership and evidence make controls real and provable.",
+   "next": "Next, assessment."
+  },
+  "assess-controls": {
+   "problem": "Nobody knows whether controls work.",
+   "cause": "Assessments lack independence and plan.",
+   "solution": "Assessment plans, methods, independence, reports and POA&Ms test and track.",
+   "next": "Next, the authorisation decision."
+  },
+  "authorize-system": {
+   "problem": "A system needs a decision on whether to operate.",
+   "cause": "Risk is not clearly accepted by the right person.",
+   "solution": "The authorisation package and the authorizing official’s risk-based decision give a clear outcome.",
+   "next": "Next, keeping it authorised."
+  },
+  "maintain-compliance": {
+   "problem": "Systems change and risk drifts.",
+   "cause": "Changes are made without analysis and monitoring is irregular.",
+   "solution": "Continuous monitoring, impact analysis, reporting and disposal keep the authorisation valid.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

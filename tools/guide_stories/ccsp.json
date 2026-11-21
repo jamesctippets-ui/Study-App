@@ -1,0 +1,112 @@
+{
+ "hero": "Victor Alvarez",
+ "intro": [
+  "Victor Alvarez is the security architect at Marlowe Retail, which has just decided to move its order system out of a managed hosting contract and into the public cloud. The CIO says security is ‘now the provider’s job’. Victor is quite sure that is not true, and he starts preparing for the CCSP to make the case properly.",
+  "Follow Victor as Marlowe’s cloud journey gives him one lesson after another."
+ ],
+ "beats": {
+  "cloud-foundations-shared-responsibility": [
+   "On the first day of the migration, the CIO cancels the quarterly access review, since the provider will handle security. Victor politely stops him. He learns what makes something cloud, how the service and deployment models change who is responsible for what, and why handing the system to a provider never hands over the accountability."
+  ],
+  "data-lifecycle-classification-dlp": [
+   "A developer copies real customer records into a test environment, and a test storage area is accidentally made public. Nobody had discovered or classified that data. Victor learns to map where data lives, label it, control how it moves, prevent leaks, and destroy it properly when it is no longer needed."
+  ],
+  "encryption-keys-tokenization": [
+   "A regulator insists that the provider must not be able to read Marlowe’s ledgers. Provider-managed keys will not satisfy that. Victor learns encryption at rest, in transit and in use, how keys are generated, stored, rotated and retired, and who holds them. He also learns when replacing data with a token is better than encrypting it."
+  ],
+  "secure-infrastructure-virtualization": [
+   "The platform team moves to Kubernetes. A scan finds the dashboard reachable from the internet, a base image two years old and a service account with cluster-wide powers. Victor learns how hypervisors and containers isolate workloads, how serverless changes the picture, and why the management plane is the crown jewels."
+  ],
+  "resilience-bcdr-risk": [
+   "Marlowe’s claims system runs in one availability zone, with nightly backups into the same account that holds production admin credentials. Ransomware gets both. Victor learns to design from impact analysis, to spread across zones and regions, to choose a recovery strategy to match the target, and to keep backups out of the attacker’s reach."
+  ],
+  "secure-sdlc-apis-iam": [
+   "A researcher shows that changing an account number in a request returns another customer’s transactions. Victor learns to build security into the lifecycle, to test in several ways, to treat APIs as the front door, to be aware of risks specific to AI assistants, and to set up identity so access is brief and traceable."
+  ],
+  "cloud-security-operations-ir": [
+   "At 2 a.m. a key is used from two continents and a new virtual machine appears in an unused region. Victor revokes sessions, quarantines the machine and preserves evidence. He learns how logging, posture checks and detection work in the cloud, and how an investigation differs when the hardware is not yours."
+  ],
+  "legal-privacy-risk-audit": [
+   "Marlowe’s European arm picks a provider based in another country. Counsel raises three issues: staff outside the region can reach personal data, subprocessors are not listed, and breach notification terms are vague. Victor learns the legal duties, how contracts and reports provide assurance, and how to manage a supplier as a risk."
+  ]
+ },
+ "epilogue": [
+  "The migration is done and the quarterly access review is back on the calendar. The CIO has stopped saying ‘the provider’s job’. On exam day Victor reads each scenario as a conversation he has already had at Marlowe: who is responsible, what could go wrong, and what proves it."
+ ],
+ "bad": {
+  "cloud-foundations-shared-responsibility": [
+   "Victor’s colleague explains that using two public cloud providers means Marlowe has a ‘hybrid cloud’. It does not; that is multi-cloud. Hybrid binds different deployment models together. The colleague takes this well, in the way that a person takes being told that a tomato is a fruit: with suspicion and a vague sense of betrayal."
+  ],
+  "data-lifecycle-classification-dlp": [
+   "The team buys a data-loss-prevention product before finding out what data they have. It is configured with rules for credit card numbers and it faithfully guards the card numbers. It does not notice the 40,000 patient records, which it has never been told about. Discovery comes first, then classification, and then the product."
+  ],
+  "encryption-keys-tokenization": [
+   "Victor announces that the data is safe because the provider ‘encrypts it with our own keys’. Whose keys? Held where? If they live in the provider’s service, the provider can use them. Only a key held outside the provider’s reach keeps the data out of the provider’s hands. The regulator reads the answer twice."
+  ],
+  "secure-infrastructure-virtualization": [
+   "The team assumes containers are as well isolated as virtual machines, because ‘it’s basically the same thing’. They share a kernel. One compromised container is now a polite visitor in everyone else’s house. Victor sketches two diagrams: the first has walls, the second has curtains."
+  ],
+  "resilience-bcdr-risk": [
+   "A designer proposes to run the claims system in three regions for ‘maximum resilience’. The recovery objective could be met for a tenth of the cost, and two of the regions break the data residency rules. The most resilient design is not always the correct one; it is the cheapest that meets the stated objectives."
+  ],
+  "secure-sdlc-apis-iam": [
+   "The team puts a web application filter in front of the API and calls the broken authorisation ‘handled’. The filter does not know that account 1234 should not see account 1235’s data. A filter is a patch for the road, not a repair of the bridge."
+  ],
+  "cloud-security-operations-ir": [
+   "On seeing the strange virtual machine at 2 a.m., a junior engineer terminates it at once, to be safe. The memory, the evidence and the story it could have told go with it. It is the digital equivalent of mopping a crime scene to make it neat."
+  ],
+  "legal-privacy-risk-audit": [
+   "Marlowe signs a contract with a certified provider and considers the privacy duties ‘handled’. The regulator disagrees. Accountability stays with the company that decides why the data is collected. A certificate on the wall is a good start, but it does not move the legal responsibility across the room."
+  ]
+ },
+ "review": {
+  "cloud-foundations-shared-responsibility": {
+   "problem": "Teams assume the provider is responsible for security.",
+   "cause": "Cloud models and responsibility splits are unclear.",
+   "solution": "The characteristics, models and shared responsibility explain who does what, and accountability stays with you.",
+   "next": "Next, protecting data through its life."
+  },
+  "data-lifecycle-classification-dlp": {
+   "problem": "Data leaks and nobody knows what is where.",
+   "cause": "Discovery and classification were skipped.",
+   "solution": "Lifecycle thinking, classification, DLP, rights management and secure deletion protect data in order.",
+   "next": "Next, encryption and keys."
+  },
+  "encryption-keys-tokenization": {
+   "problem": "Encryption is in place but control of the keys is unclear.",
+   "cause": "Keys are held by the provider and the options are mixed up.",
+   "solution": "Encryption states, key management options, HSMs, BYOK and HYOK, and tokenization give control.",
+   "next": "Next, securing infrastructure."
+  },
+  "secure-infrastructure-virtualization": {
+   "problem": "Shared infrastructure creates new attack routes.",
+   "cause": "Isolation differs between virtual machines, containers and serverless.",
+   "solution": "Hypervisor, container, serverless and network controls fit each model.",
+   "next": "Next, resilience and disaster recovery."
+  },
+  "resilience-bcdr-risk": {
+   "problem": "Outages and attacks take systems and backups down together.",
+   "cause": "Single zones, shared credentials and untested plans.",
+   "solution": "Impact analysis, recovery objectives, zones and regions, strategies and immutable backups provide resilience at the right cost.",
+   "next": "Next, secure development and identity."
+  },
+  "secure-sdlc-apis-iam": {
+   "problem": "Applications and APIs are attacked through logic flaws.",
+   "cause": "Security is added late and identity is weak.",
+   "solution": "Secure SDLC, threat modelling, testing, API protection and federation fix it at the right stage.",
+   "next": "Next, operations and incident response."
+  },
+  "cloud-security-operations-ir": {
+   "problem": "Cloud incidents are fast and evidence is ephemeral.",
+   "cause": "Logging, posture and plans are not ready.",
+   "solution": "Logging, posture management, detection, the incident lifecycle and cloud forensics prepare and respond.",
+   "next": "Next, legal, privacy and audit."
+  },
+  "legal-privacy-risk-audit": {
+   "problem": "Legal duties and vendor risk are unmanaged.",
+   "cause": "Responsibility is assumed to transfer to the provider.",
+   "solution": "Privacy law, contracts, assurance reports and vendor management define and evidence duties.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

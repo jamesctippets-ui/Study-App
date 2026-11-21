@@ -1,0 +1,160 @@
+{
+ "hero": "Noor Haddad",
+ "intro": [
+  "Noor Haddad is a business analyst at Northwind Credit Union. After a phishing scare, the board asks every department to nominate someone to understand security, compliance and identity. Noor puts a hand up before anyone else can and then spends the weekend wondering what she volunteered for. SC-900 is the starting point.",
+  "Follow Noor through one very eventful quarter at Northwind, from the first phishing email to a clean audit."
+ ],
+ "beats": {
+  "security-compliance-concepts": [
+   "The credit union is moving its HR app to the cloud. Noor’s first question: “So is security now the provider’s problem?” Not exactly. The provider looks after the building and the hardware; Northwind still decides who signs in and what data is stored. Noor learns that security is built in layers, that trust is never assumed, and that encryption and hashing are different things for different jobs."
+  ],
+  "identity-concepts": [
+   "A supplier portal lets Northwind staff click “Sign in with your work account.” Noor watches as the work directory vouches for the employee and the supplier’s app trusts that vouching. Two questions are being answered in order: who are you, and what are you allowed to see? Noor learns the words for each, and why identity has become the new edge of the network."
+  ],
+  "entra-identities": [
+   "Northwind’s staff accounts live in an on-premises directory, but everyone needs Microsoft 365. Noor learns how accounts are synchronised so each person has one identity, and how apps can get their own identities without passwords. She also learns the difference between employees, guests from partner organisations, and the machine identities no one thinks about until something breaks."
+  ],
+  "entra-authentication": [
+   "After the phishing scare, the board wants everyone to use something stronger than a password. Noor learns about the second factor, the authenticator app, passkeys, and sign-in methods without passwords at all. For the small satellite branch with basic licences, there is a simple default that switches protection on for everyone. For the main office, there is a more flexible approach with banned passwords and self-service reset."
+  ],
+  "entra-access-governance": [
+   "Finance staff must use extra verification from outside the office. Noor learns the safe way to roll that out: start with a policy that only reports what it would have done, check the logs, then enforce. She also meets the idea of administrators who are only eligible for powerful roles and activate them for a short time, and of regular reviews to remove access nobody needs any more."
+  ],
+  "azure-infrastructure-security": [
+   "The new customer portal goes into Azure. Noor sketches its protection like a castle: a filter at the front door for web attacks, protection against floods of traffic, rules separating the web and database areas, a controlled way for administrators to log in without exposing anything, and a safe for keys and secrets. Each defence has one job, and none is expected to do them all."
+  ],
+  "defender-for-cloud": [
+   "Northwind’s workloads sit in more than one cloud. Noor connects them to a single dashboard that gives a score for how well the environment is configured, and a ranked list of the fixes that would raise it most. She also sees how it maps routes an attacker might take, and how it can keep remote desktop ports closed until someone needs them."
+  ],
+  "microsoft-sentinel": [
+   "Logs from sign-ins, email, firewalls and the cloud all land in one place. Noor sees a rule that spots someone signing in from two countries within an hour, raises an incident, and automatically disables the account while alerting the security team. Analysts can also go hunting through the data for things no rule has caught yet. She learns the two acronyms that describe this: one for collecting and analysing, one for responding automatically."
+  ],
+  "defender-xdr": [
+   "A staff member clicks a phishing link. The link is blocked at the moment of the click, but another route has already put malware on a laptop. Noor watches as separate protections for email, devices, identities and cloud apps each notice a piece of the story, and a single portal stitches them into one incident. She learns why “extended” detection is about connecting signals."
+  ],
+  "service-trust-privacy": [
+   "Audit season. The auditor wants evidence about the cloud provider’s own security certifications and how Northwind meets a regulation. Noor learns where the provider publishes its audit reports, how privacy principles guide what is done with customer data, and how a compliance score shows which actions would close the gaps. She assigns the actions to teams and watches the score climb."
+  ],
+  "information-protection": [
+   "The legal team wants a “Client Confidential” label that encrypts documents and travels with them. Noor learns how data can be found and classified, how labels are published, how rules can stop labelled files being emailed outside, and how retention rules keep or delete things on a schedule. Everything is aimed at one question: what does Northwind own, and how should it be treated?"
+  ],
+  "insider-ediscovery-audit": [
+   "An engineer who has handed in notice is copying files to a personal cloud account. Noor sees how an insider risk alert becomes a case. Later, a lawsuit arrives: she learns how legal can search across mailboxes and files, place holds so nothing is deleted, and export what is needed, with an audit trail of who did what and when."
+  ]
+ },
+ "epilogue": [
+  "The audit comes back clean. Noor has gone from “what is a tenant?” to explaining Zero Trust to the board in plain words. On exam day she is nervous, but then she reads the first question and realises it is about a problem she has already seen, with different names on it."
+ ],
+ "bad": {
+  "security-compliance-concepts": [
+   "Noor’s first memo to the board says the cloud provider ‘now owns security’. The board sighs with relief and cancels the staff security training. A fortnight later a staff member shares a password in a chat. The provider’s data centres are indeed very secure. The chat window is, regrettably, Northwind’s."
+  ],
+  "identity-concepts": [
+   "Noor tells a colleague that signing in ‘gives you access to everything you need’. It does not. Signing in proves who you are; what you can do is a separate decision. The colleague logs in successfully and finds nothing opens, which Noor patiently explains is not a bug, merely a very polite ‘no’."
+  ],
+  "entra-identities": [
+   "A partner from another company needs access, and a keen administrator creates a brand-new account with a password for them, emailed in plain text. The partner already has their own work identity. Now there are two accounts and one very visible password in an inbox."
+  ],
+  "entra-authentication": [
+   "To ‘strengthen’ security the team requires two passwords. Noor points out that two of the same kind of factor is still one factor, which is rather like locking the door twice with the same key. Meanwhile, another team insists that text-message codes cannot be phished. They can."
+  ],
+  "entra-access-governance": [
+   "Noor turns on a strict new sign-in rule straight to enforcement, on a Friday. By 9 a.m. Monday, finance cannot sign in because their device was not enrolled. Report-only mode, the gentle rehearsal, would have shown the problem first. She is not allowed to forget it."
+  ],
+  "azure-infrastructure-security": [
+   "The team relies on a network rule to ‘stop web attacks’. The rule cheerfully allows the web port, and the attack walks in through it, since rules on ports cannot read what is inside the request. A web application filter would have noticed. The administrator, meanwhile, remote-desktops directly into a server with a public address, ‘just for now’."
+  ],
+  "defender-for-cloud": [
+   "A colleague watches the secure score climb and braces for bad news, assuming a higher score means more problems. Noor explains that the score is a report card, not an alarm: higher means lower risk. The colleague, who had cleared the afternoon to panic, goes for a coffee instead."
+  ],
+  "microsoft-sentinel": [
+   "The team sets up a playbook to respond to threats but never connects any data sources. The playbook waits patiently for something to respond to. It waits a very long time. Without connectors there is nothing to detect, and a response with nothing to respond to is a very expensive screensaver."
+  ],
+  "defender-xdr": [
+   "A security manager assumes the product that protects cloud servers also protects the staff’s email attachments. It does not. Different products protect different areas, and the gaps between them are exactly where the phishing email landed. Noor draws the map on a whiteboard, with colours."
+  ],
+  "service-trust-privacy": [
+   "Preparing for the audit, a colleague proudly announces that the compliance score is 78 percent and therefore the clinic is 78 percent compliant. The auditor, a calm woman with an enormous binder, explains that the score measures progress on actions, not proof of anything. The colleague goes quiet."
+  ],
+  "information-protection": [
+   "Noor creates a beautiful ‘Client Confidential’ label and is puzzled that nobody uses it. She forgot to publish it with a policy. The label sits in the system unseen, like a very important sign in a locked cupboard."
+  ],
+  "insider-ediscovery-audit": [
+   "A manager suspects an employee and starts reading his emails ‘just to see’. Legal explains that there is a process for this, with approvals, records and legitimate holds. The employee, who was innocent, hears about it anyway. The audit log, as it happens, recorded who went looking."
+  ]
+ },
+ "review": {
+  "security-compliance-concepts": {
+   "problem": "Nobody agrees who is responsible for security once systems move to the cloud.",
+   "cause": "Responsibility is shared, but unevenly, and the same words are used for different ideas.",
+   "solution": "Shared responsibility, defence in depth, Zero Trust, encryption and governance give a common vocabulary and a division of duties.",
+   "next": "Next, how identity works as the new perimeter."
+  },
+  "identity-concepts": {
+   "problem": "Systems must know who someone is and what they may do, across many applications.",
+   "cause": "Identity and permission are mixed up, and each application keeps its own list.",
+   "solution": "Authentication, authorisation, identity providers, directories and federation separate and connect the pieces.",
+   "next": "Next, Microsoft’s own identity service and its types of identity."
+  },
+  "entra-identities": {
+   "problem": "Organisations have employees, partners, apps and machines, all needing identities.",
+   "cause": "Identities live in many places and are created by hand.",
+   "solution": "Entra ID, its editions, identity types and hybrid sync give one managed home for all of them.",
+   "next": "Next, how those identities prove who they are."
+  },
+  "entra-authentication": {
+   "problem": "Passwords are weak, and attackers use them.",
+   "cause": "One factor, easily guessed or phished, protects everything.",
+   "solution": "MFA, passwordless methods, defaults and self-service reset strengthen proof of identity.",
+   "next": "Next, controlling and governing access once someone is signed in."
+  },
+  "entra-access-governance": {
+   "problem": "Access is too broad and never reviewed.",
+   "cause": "Rules are static and permanent, and nobody checks who still needs what.",
+   "solution": "Conditional Access, roles, PIM, access reviews and governance tools adjust and remove access.",
+   "next": "Next, protecting the infrastructure itself."
+  },
+  "azure-infrastructure-security": {
+   "problem": "Cloud systems are exposed to the internet and to each other.",
+   "cause": "Networks are open by default in places, and different attacks need different defences.",
+   "solution": "DDoS protection, firewalls, web filters, segmentation, Bastion and Key Vault each cover one layer.",
+   "next": "Next, a single view of posture across clouds."
+  },
+  "defender-for-cloud": {
+   "problem": "Nobody knows how secure the whole environment is.",
+   "cause": "Settings and resources vary across subscriptions and clouds.",
+   "solution": "Defender for Cloud scores posture, recommends fixes, maps attack paths and protects workloads.",
+   "next": "Next, collecting and responding to security events."
+  },
+  "microsoft-sentinel": {
+   "problem": "Logs are scattered and attacks go unseen.",
+   "cause": "Data lives in separate systems and humans cannot read it all.",
+   "solution": "Sentinel collects it, rules detect, hunting explores and playbooks respond.",
+   "next": "Next, protecting users, devices and email with XDR."
+  },
+  "defender-xdr": {
+   "problem": "One attack touches email, devices, identities and apps, but each alert is separate.",
+   "cause": "Tools see only their own area.",
+   "solution": "Defender XDR correlates signals across all of them into a single incident.",
+   "next": "Next, proving compliance and handling privacy."
+  },
+  "service-trust-privacy": {
+   "problem": "Auditors and regulators want evidence.",
+   "cause": "Evidence is scattered and the rules are many.",
+   "solution": "The Service Trust Portal, privacy principles and Compliance Manager provide documents, actions and a score.",
+   "next": "Next, classifying and protecting data."
+  },
+  "information-protection": {
+   "problem": "Sensitive data is not labelled and moves freely.",
+   "cause": "Nobody classified it or applied rules to how it is kept and shared.",
+   "solution": "Classification, labels, DLP and retention find, protect and manage data through its life.",
+   "next": "Next, the people-side risks, legal discovery and audit."
+  },
+  "insider-ediscovery-audit": {
+   "problem": "Trusted people, or lawsuits, create risks that perimeter tools miss.",
+   "cause": "Insider actions look normal, and legal requests arrive with no preparation.",
+   "solution": "Insider risk, eDiscovery and audit detect, preserve and record.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}

@@ -1,0 +1,100 @@
+{
+ "hero": "Maya Okafor",
+ "intro": [
+  "Maya Okafor works the service desk at Harbourline Logistics, a freight company with forty depots and one very tired IT team. She is good at closing tickets. Her manager, Dev, has just asked her to help the company adopt ITIL, and Maya has a confession: she only half knows what the word means.",
+  "Follow Maya as she learns the vocabulary, argues with a change board, maps a messy process, and finds out that ITIL is mostly common sense with better names."
+ ],
+ "beats": {
+  "language-of-value": [
+   "Maya’s monthly report is her pride: 500 tickets closed. Dev reads it and asks one question: “Do the depots feel better?” Maya checks. The depot managers say the label printers still jam every morning. Five hundred tickets closed, and nobody is happier. That gap, between what the help desk produces and what the depots actually get out of it, is the first thing ITIL teaches her to name."
+  ],
+  "roles-and-relationships": [
+   "Dev wants Maya in the room for a meeting with a software vendor, a depot manager and the finance director. Maya assumes they are all “the customer.” Dev gently corrects her: one person pays, one person uses the system every day, one person set the budget, and the vendor sells a product but does not run the service. The meeting only makes sense once Maya sorts out who plays which role."
+  ],
+  "value-system-and-principles": [
+   "At the change meeting, Maya watches a routine, pre-approved change wait for three signatures. It has been done a hundred times. Dev scribbles two of the seven guiding principles on a napkin: keep it simple and practical, and focus on value. Maya realises the board is not being careful, just slow. The napkin becomes her first reference card for how the whole ITIL system fits together."
+  ],
+  "governance-continual-improvement-practices": [
+   "Over a Monday full of checkout-style failures at the depot booking portal, Maya restarts a stuck process and the incident is closed in an hour. By Wednesday it happens again. Dev points out that restoring service and finding the cause are different jobs done by different practices. Maya opens a problem record, and, for the first time, starts a list of things to improve."
+  ],
+  "four-dimensions": [
+   "Harbourline decides to outsource its network monitoring. Maya expects it to be a quick contract. Then she realises the staff need retraining on the vendor’s alerts, the data has to flow into their own tools, the process for escalating has to change, and a new regulation is about to affect how they store records. One decision touches every side of the business at once."
+  ],
+  "product-service-lifecycle": [
+   "Dev asks Maya to lead a small idea: a self-service password reset tool for the depots. Maya jumps straight to buying software. Dev stops her and walks through the order of things: find out whether people want it, decide exactly what it must do, get or build it, test it into service, run it, and support it. Maya had been about to skip the first two steps."
+  ],
+  "streams-ai-and-frameworks": [
+   "Maya maps how a request travels from a depot to a fix and spots something odd: requests sit untouched in a queue for six hours, while the fix itself takes twenty minutes. The delay is the problem, not the technical skill. Meanwhile, management wants an AI assistant on the desk. Maya now has a way to look at both questions: where does the work wait, and where would automation actually help?"
+  ]
+ },
+ "epilogue": [
+  "Exam morning. Maya has a pen, a coffee and a head full of words she could not have defined a month ago: outcome, warranty, value stream, continual improvement. She thinks about the label printers. They had been the whole point all along: not tickets closed, but depots that work. She walks in ready."
+ ],
+ "bad": {
+  "language-of-value": [
+   "Maya’s first draft of the monthly report is titled ‘Helpdesk Triumphs’ and contains a chart of a line going up and to the right. The line is ticket volume. Dev asks whether a rising number of tickets is good news or bad news. Maya opens her mouth, closes it, and renames the chart ‘Things That Are Broken More Often’. That is not the lesson, but it is a start."
+  ],
+  "roles-and-relationships": [
+   "Maya opens the vendor meeting by addressing everyone as ‘dear customer’. The finance director, who signs the cheque, nods. The depot manager, who actually uses the system, asks why nobody has asked her anything. The vendor, who only sells licences, asks why he is being asked to fix printers. Three roles, one very awkward coffee break."
+  ],
+  "value-system-and-principles": [
+   "Maya’s first ‘improvement’ is to automate the three-signature approval process, so the same pointless sign-offs now happen at lightning speed. Dev takes a long look at the workflow chart. ‘You’ve made the bad process faster,’ he says. ‘That’s not progress, that’s a more efficient way to be annoyed.’"
+  ],
+  "governance-continual-improvement-practices": [
+   "After the second portal outage, Maya restarts the process, closes the ticket and writes ‘fixed’ in the notes. On Friday it breaks again. And again on Monday. Dev suggests that restarting something every few days is not a fix, it is a hobby. A problem record would have helped."
+  ],
+  "four-dimensions": [
+   "Maya signs the monitoring contract in a single afternoon and considers the job done. Three weeks later the vendor’s alerts are in a format nobody understands, the logs do not fit the company’s tools, and the escalation process still sends calls to a manager who left in March. She had looked at one dimension out of four."
+  ],
+  "product-service-lifecycle": [
+   "Maya buys the password-reset software on Tuesday and starts the ‘discover’ step on Thursday, which is a bit like building a house and then asking if anyone wants to live there. The depots mostly want faster support, not another login screen. The software is, technically, excellent. It is also unused."
+  ],
+  "streams-ai-and-frameworks": [
+   "Management is keen to ‘add AI’ to fix the slow queue. Maya asks where the six hours go. Nobody knows. An AI assistant is bought and quietly makes the first twenty minutes a little faster, while the six-hour wait stays exactly where it was. The assistant is delighted, as it is paid by the month."
+  ]
+ },
+ "review": {
+  "language-of-value": {
+   "problem": "Providers count what they produce, tickets closed or services delivered, and customers feel something else entirely.",
+   "cause": "The provider measures outputs, while the customer judges outcomes, and nobody has defined the difference or written down what ‘good enough’ means.",
+   "solution": "The chapter gives you the vocabulary: output versus outcome, utility versus warranty, and a service level as a target that an agreement turns into a promise.",
+   "next": "Next, who is who in a service relationship, and how cost and risk fit into it."
+  },
+  "roles-and-relationships": {
+   "problem": "People in a service conversation talk past each other because everyone is called ‘the customer’.",
+   "cause": "Several different roles, the one who defines requirements, the one who pays, the one who uses, are often filled by different people, and sometimes by one.",
+   "solution": "The chapter separates customer, user, sponsor, provider and consumer, and shows the difference between a service relationship and simply selling a product.",
+   "next": "Next, the system that ties these roles together and the principles that guide decisions in it."
+  },
+  "value-system-and-principles": {
+   "problem": "Good intentions get buried under heavy process, and well-meant changes make things slower.",
+   "cause": "Organisations adopt practices without a shared set of principles for deciding what to keep, change or drop.",
+   "solution": "The value system shows how the pieces fit, and the seven guiding principles give a way to test any decision: focus on value, start where you are, simplify, and so on.",
+   "next": "Next, how governance and continual improvement turn principles into everyday practice."
+  },
+  "governance-continual-improvement-practices": {
+   "problem": "The same failures keep coming back, and improvement happens by accident, if at all.",
+   "cause": "Restoring service is rewarded, finding the cause is nobody’s job, and improvements start without a baseline or a target.",
+   "solution": "Incident and problem management are separate practices with separate goals, change enablement controls risk in proportion, and the Continual Improvement Model gives improvement a repeatable shape.",
+   "next": "Next, the four dimensions that every service must be looked at through."
+  },
+  "four-dimensions": {
+   "problem": "Decisions get made from one angle, usually technology, and then fail for reasons nobody looked at.",
+   "cause": "Services depend on people, information, suppliers and processes, and outside pressures act on all of them at once.",
+   "solution": "The four dimensions, plus the PESTLE factors that press on them, give a checklist so that no side is forgotten.",
+   "next": "Next, how a product or service moves from an idea to something people are using."
+  },
+  "product-service-lifecycle": {
+   "problem": "Teams jump to building before they know what is needed, or finish building and forget to support it.",
+   "cause": "Work is treated as a one-way pipeline rather than eight connected activities that can loop back.",
+   "solution": "The lifecycle names the eight activities, discover through support, and keeps each one’s job distinct, so you always know where you are and what is missing.",
+   "next": "Next, how to see where work actually flows, where it waits, and where AI and other frameworks fit."
+  },
+  "streams-ai-and-frameworks": {
+   "problem": "Work sits in queues, new tools are bought without knowing where the delay is, and frameworks seem to compete.",
+   "cause": "Nobody has mapped how work flows from request to fix, so effort goes into the fast parts instead of the slow ones.",
+   "solution": "Value stream mapping shows the waits, the AI chapter separates assistance from agency, and ITIL, Agile, DevOps and PRINCE2 turn out to be partners rather than rivals.",
+   "next": "That completes the lessons. Next come the cheat sheet, the word bank and the practice questions."
+  }
+ }
+}
