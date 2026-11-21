@@ -59,3 +59,28 @@ jobs:
             gh release create eink-study-pack --prerelease --title "E-ink study pack" --notes "$notes" --target "$GITHUB_SHA"
           fi
           gh release upload eink-study-pack study-pack.zip --clobber
+
+      # A web page cannot download release assets (no cross-origin headers), so
+      # the same pack also goes to the `eink-study-pack` branch as plain files,
+      # which raw.githubusercontent.com serves to any page. CrossBlink's browser
+      # flasher reads files.json and fetches only the tracks you tick.
+      #   https://raw.githubusercontent.com/<owner>/<repo>/eink-study-pack/study/manifest.json
+      - name: Publish to the eink-study-pack branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd pack-out
+          (cd study && find . -type f | sed 's|^\./||' | sort | while read -r f; do
+             printf '{"path":"%s","size":%s}\n' "$f" "$(stat -c %s "$f")"
+           done) | jq -s --arg built "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg sha "$GITHUB_SHA" \
+             '{built: $built, sha: $sha, files: .}' > files.json
+          mv files.json study/files.json
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan eink-study-pack
+          git add study
+          git commit -q -m "E-ink study pack from ${GITHUB_SHA::7}"
+          # One commit, replaced each time, so old packs do not pile up in history.
+          git push -q --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" eink-study-pack
