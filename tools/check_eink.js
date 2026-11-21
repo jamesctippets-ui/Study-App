@@ -130,6 +130,8 @@ if (py.status === 0) {
       const cards = lines(path.join(study, t.key, 'cards.jsonl'));
       const qs = lines(path.join(study, t.key, 'questions.jsonl'));
       eq([cards.length, qs.length], [t.cards, t.questions], `${t.key}: manifest counts match the files`);
+      const cfg = manifest.examConfig[t.key];
+      if (cfg) eq(t.exam, { length: cfg.length, minutes: cfg.minutes, passPct: cfg.passPct }, `${t.key}: practice-test settings`);
       eq(cards.length, d.flashcards.length, `${t.key}: every card is packed`);
       eq(qs.length, d.questions.filter((q) => !q.image && ['mc', 'tf', 'ms'].includes(q.type)).length, `${t.key}: every question without an image is packed`);
       const byId = new Map(d.flashcards.map((c) => [c.id, c]));
